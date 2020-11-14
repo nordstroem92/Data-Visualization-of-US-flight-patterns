@@ -70,8 +70,9 @@ function processData(values) {
     link.source.outgoing += link.count;
   });
 
+  flights = flights.filter(flight => flight.DATE > '2018-01-05' && flight.DATE < '2018-01-10');
+
   drawAirports(airports);
-  drawPolygons(airports);
   drawFlights(airports, flights);
 }
 
@@ -102,6 +103,23 @@ function drawMap(map) {
     .attr("d", path);
 }
 
+function drawAirports(airports) {
+  // draw airport bubbles
+  g.airports.selectAll("circle.airport")
+    .data(airports, d => d.ident)
+    .enter()
+    .append("circle")
+    .attr("r",  d => scales.airports(d.outgoing)/300)
+    .attr("cx", d => d.x) // calculated on load
+    .attr("cy", d => d.y) // calculated on load
+    .attr("class", "airport")
+    .each(function(d) {
+      // adds the circle object to our airport
+      // makes it fast to select airports on hover
+      d.bubble = this;
+    });
+}
+
 
 // see airports.csv
 // convert gps coordinates to number and init degree
@@ -125,104 +143,6 @@ function typeAirport(airport) {
 function typeFlight(flight) {
   flight.count = parseInt(flight.FLIGHTCOUNT);
   return flight;
-}
-
-function drawAirports(airports) {
-  // adjust scale
-  //const extent = d3.extent(airports, d => d.outgoing);
-  //scales.airports.domain(extent);
-
-  // draw airport bubbles
-  g.airports.selectAll("circle.airport")
-    .data(airports, d => d.ident)
-    .enter()
-    .append("circle")
-    .attr("r",  d => scales.airports(d.outgoing)/300)
-    .attr("cx", d => d.x) // calculated on load
-    .attr("cy", d => d.y) // calculated on load
-    .attr("class", "airport")
-    .each(function(d) {
-      // adds the circle object to our airport
-      // makes it fast to select airports on hover
-      d.bubble = this;
-    });
-}
-
-function drawPolygons(airports) {
-  // convert array of airports into geojson format
-  const geojson = airports.map(function(airport) {
-    return {
-      type: "Feature",
-      properties: airport,
-      geometry: {
-        type: "Point",
-        coordinates: [[airport.longitude_deg, airport.latitude_deg]]
-      }
-    };
-  });
-
-  // calculate voronoi polygons
-  const polygons = d3.geoVoronoi().polygons(geojson);
-  console.log(polygons);
-
-  g.voronoi.selectAll("path")
-    .data(polygons.features)
-    .enter()
-    .append("path")
-    .attr("d", d3.geoPath(projection))
-    .attr("class", "voronoi")
-    .on("mouseover", function(d) {
-      let airport = d.properties.site.properties;
-
-      d3.select(airport.bubble)
-        .classed("highlight", true);
-
-      d3.selectAll(airport.flights)
-        .classed("highlight", true)
-        .raise();
-
-      // make tooltip take up space but keep it invisible
-      tooltip.style("display", null);
-      tooltip.style("visibility", "hidden");
-
-      // set default tooltip positioning
-      tooltip.attr("text-anchor", "middle");
-      tooltip.attr("dy", -scales.airports(airport.outgoing) - 4);
-      tooltip.attr("x", airport.x);
-      tooltip.attr("y", airport.y);
-
-      // set the tooltip text
-      tooltip.text(airport.name + " in " + airport.city + ", " + airport.state);
-
-      // double check if the anchor needs to be changed
-      let bbox = tooltip.node().getBBox();
-
-      if (bbox.x <= 0) {
-        tooltip.attr("text-anchor", "start");
-      }
-      else if (bbox.x + bbox.width >= width) {
-        tooltip.attr("text-anchor", "end");
-      }
-
-      tooltip.style("visibility", "visible");
-    })
-    .on("mouseout", function(d) {
-      let airport = d.properties.site.properties;
-
-      d3.select(airport.bubble)
-        .classed("highlight", false);
-
-      d3.selectAll(airport.flights)
-        .classed("highlight", false);
-
-      d3.select("text#tooltip").style("visibility", "hidden");
-    })
-    .on("dblclick", function(d) {
-      // toggle voronoi outline
-      let toggle = d3.select(this).classed("highlight");
-      d3.select(this).classed("highlight", !toggle);
-    });
-    console.log("drawn");
 }
 
 function drawFlights(airports, flights) {
@@ -250,16 +170,16 @@ function drawFlights(airports, flights) {
   // https://github.com/d3/d3-force
   let layout = d3.forceSimulation()
     // settle at a layout faster
-    .alphaDecay(0.1)
+    .alphaDecay(0.5)
     // nearby nodes attract each other
     .force("charge", d3.forceManyBody()
-      .strength(10)
-      .distanceMax(scales.airports.range()[1] * 2)
+      .strength(8) 
+      .distanceMax(scales.airports.range()[1] * 3)
     )
     // edges want to be as short as possible
     // prevents too much stretching
     .force("link", d3.forceLink()
-      .strength(0.7)
+      .strength(0.3)
       .distance(0)
     )
     .on("tick", function(d) {
@@ -271,6 +191,7 @@ function drawFlights(airports, flights) {
 
   layout.nodes(bundle.nodes).force("link").links(bundle.links);
 }
+
 
 // Turns a single edge into several segments that can
 // be used for simple edge bundling.
@@ -350,4 +271,5 @@ function distance(source, target) {
   const dy2 = Math.pow(target.y - source.y, 2);
 
   return Math.sqrt(dx2 + dy2);
+
 }
