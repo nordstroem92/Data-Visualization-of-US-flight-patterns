@@ -22,6 +22,17 @@ const hypotenuse = Math.sqrt(width * width + height * height);
 // source: https://github.com/topojson/us-atlas
 const projection = d3.geoAlbers().scale(1280).translate([480, 300]);
 
+const scales = {
+  // used to scale airport bubbles
+  airports: d3.scaleSqrt()
+    .range([4, 18]),
+
+  // used to scale number of segments per line
+  segments: d3.scaleLinear()
+    .domain([0, hypotenuse])
+    .range([1, 10])
+};
+
 // have these already created for easier drawing
 const g = {
   basemap:  svg.select("g#basemap"),
@@ -56,17 +67,12 @@ function processData(values) {
   flights.forEach(function(link) {
     link.source = ident.get(link.ORIGIN);
     link.target = ident.get(link.DESTINATION);
-
-    if(link.source.outgoing != undefined) { //VED IKKE HVAD DER ER UNDEFINED
-      link.source.outgoing += link.count;
-      console.log(link.source);
-    }
+    link.source.outgoing += link.count;
   });
 
-
-
   drawAirports(airports);
-
+  drawPolygons(airports);
+  drawFlights(airports, flights);
 }
 
 // DRAW UNDERLYING MAP
@@ -131,7 +137,7 @@ function drawAirports(airports) {
     .data(airports, d => d.ident)
     .enter()
     .append("circle")
-    .attr("r",  5)
+    .attr("r",  d => scales.airports(d.outgoing)/300)
     .attr("cx", d => d.x) // calculated on load
     .attr("cy", d => d.y) // calculated on load
     .attr("class", "airport")
@@ -140,4 +146,208 @@ function drawAirports(airports) {
       // makes it fast to select airports on hover
       d.bubble = this;
     });
+}
+
+function drawPolygons(airports) {
+  // convert array of airports into geojson format
+  const geojson = airports.map(function(airport) {
+    return {
+      type: "Feature",
+      properties: airport,
+      geometry: {
+        type: "Point",
+        coordinates: [[airport.longitude_deg, airport.latitude_deg]]
+      }
+    };
+  });
+
+  // calculate voronoi polygons
+  const polygons = d3.geoVoronoi().polygons(geojson);
+  console.log(polygons);
+
+  g.voronoi.selectAll("path")
+    .data(polygons.features)
+    .enter()
+    .append("path")
+    .attr("d", d3.geoPath(projection))
+    .attr("class", "voronoi")
+    .on("mouseover", function(d) {
+      let airport = d.properties.site.properties;
+
+      d3.select(airport.bubble)
+        .classed("highlight", true);
+
+      d3.selectAll(airport.flights)
+        .classed("highlight", true)
+        .raise();
+
+      // make tooltip take up space but keep it invisible
+      tooltip.style("display", null);
+      tooltip.style("visibility", "hidden");
+
+      // set default tooltip positioning
+      tooltip.attr("text-anchor", "middle");
+      tooltip.attr("dy", -scales.airports(airport.outgoing) - 4);
+      tooltip.attr("x", airport.x);
+      tooltip.attr("y", airport.y);
+
+      // set the tooltip text
+      tooltip.text(airport.name + " in " + airport.city + ", " + airport.state);
+
+      // double check if the anchor needs to be changed
+      let bbox = tooltip.node().getBBox();
+
+      if (bbox.x <= 0) {
+        tooltip.attr("text-anchor", "start");
+      }
+      else if (bbox.x + bbox.width >= width) {
+        tooltip.attr("text-anchor", "end");
+      }
+
+      tooltip.style("visibility", "visible");
+    })
+    .on("mouseout", function(d) {
+      let airport = d.properties.site.properties;
+
+      d3.select(airport.bubble)
+        .classed("highlight", false);
+
+      d3.selectAll(airport.flights)
+        .classed("highlight", false);
+
+      d3.select("text#tooltip").style("visibility", "hidden");
+    })
+    .on("dblclick", function(d) {
+      // toggle voronoi outline
+      let toggle = d3.select(this).classed("highlight");
+      d3.select(this).classed("highlight", !toggle);
+    });
+    console.log("drawn");
+}
+
+function drawFlights(airports, flights) {
+  // break each flight between airports into multiple segments
+  let bundle = generateSegments(airports, flights);
+
+  // https://github.com/d3/d3-shape#curveBundle
+  let line = d3.line()
+    .curve(d3.curveBundle)
+    .x(airport => airport.x)
+    .y(airport => airport.y);
+
+  let links = g.flights.selectAll("path.flight")
+    .data(bundle.paths)
+    .enter()
+    .append("path")
+    .attr("d", line)
+    .attr("class", "flight")
+    .each(function(d) {
+      // adds the path object to our source airport
+      // makes it fast to select outgoing paths
+      d[0].flights.push(this);
+    });
+
+  // https://github.com/d3/d3-force
+  let layout = d3.forceSimulation()
+    // settle at a layout faster
+    .alphaDecay(0.1)
+    // nearby nodes attract each other
+    .force("charge", d3.forceManyBody()
+      .strength(10)
+      .distanceMax(scales.airports.range()[1] * 2)
+    )
+    // edges want to be as short as possible
+    // prevents too much stretching
+    .force("link", d3.forceLink()
+      .strength(0.7)
+      .distance(0)
+    )
+    .on("tick", function(d) {
+      links.attr("d", line);
+    })
+    .on("end", function(d) {
+      console.log("layout complete");
+    });
+
+  layout.nodes(bundle.nodes).force("link").links(bundle.links);
+}
+
+// Turns a single edge into several segments that can
+// be used for simple edge bundling.
+function generateSegments(nodes, links) {
+  // generate separate graph for edge bundling
+  // nodes: all nodes including control nodes
+  // links: all individual segments (source to target)
+  // paths: all segments combined into single path for drawing
+  let bundle = {nodes: [], links: [], paths: []};
+
+  // make existing nodes fixed
+  bundle.nodes = nodes.map(function(d, i) {
+    d.fx = d.x;
+    d.fy = d.y;
+    return d;
+  });
+
+  links.forEach(function(d, i) {
+    // calculate the distance between the source and target
+    let length = distance(d.source, d.target);
+
+    // calculate total number of inner nodes for this link
+    let total = Math.round(scales.segments(length));
+
+    // create scales from source to target
+    let xscale = d3.scaleLinear()
+      .domain([0, total + 1]) // source, inner nodes, target
+      .range([d.source.x, d.target.x]);
+
+    let yscale = d3.scaleLinear()
+      .domain([0, total + 1])
+      .range([d.source.y, d.target.y]);
+
+    // initialize source node
+    let source = d.source;
+    let target = null;
+
+    // add all points to local path
+    let local = [source];
+
+    for (let j = 1; j <= total; j++) {
+      // calculate target node
+      target = {
+        x: xscale(j),
+        y: yscale(j)
+      };
+
+      local.push(target);
+      bundle.nodes.push(target);
+
+      bundle.links.push({
+        source: source,
+        target: target
+      });
+
+      source = target;
+    }
+
+    local.push(d.target);
+
+    // add last link to target node
+    bundle.links.push({
+      source: target,
+      target: d.target
+    });
+
+    bundle.paths.push(local);
+  });
+
+  return bundle;
+}
+
+// calculates the distance between two nodes
+// sqrt( (x2 - x1)^2 + (y2 - y1)^2 )
+function distance(source, target) {
+  const dx2 = Math.pow(target.x - source.x, 2);
+  const dy2 = Math.pow(target.y - source.y, 2);
+
+  return Math.sqrt(dx2 + dy2);
 }
