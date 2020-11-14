@@ -5,11 +5,11 @@ const urls = {
 
   // source: https://gist.github.com/mbostock/7608400
   airports:
-    "https://raw.githubusercontent.com/nordstroem92/davi/master/airport_locations.csv",
+    "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/airport_locations.csv",
 
   // source: https://gist.github.com/mbostock/7608400
   flights:
-    "https://gist.githubusercontent.com/mbostock/7608400/raw/e5974d9bba45bc9ab272d98dd7427567aafd55bc/flights.csv"
+    "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/merged_flight_data.csv"
 };
 
 const svg  = d3.select("svg");
@@ -38,6 +38,7 @@ d3.json(urls.map).then(drawMap);
 // load the airport and flight data together
 const promises = [
   d3.csv(urls.airports, typeAirport),
+  d3.csv(urls.flights,  typeFlight)
 ];
 
 Promise.all(promises).then(processData);
@@ -45,57 +46,30 @@ Promise.all(promises).then(processData);
 // process airport and flight data
 function processData(values) {
   let airports = values[0];
+  let flights  = values[1];
   console.log("airports: " + airports.length);
-  console.log(airports[0]);
+  console.log("flights: " + flights.length);
 
   // convert airports array (pre filter) into map for fast lookup - lav lufthavn søgbar fra dens ident-name
   let ident = new Map(airports.map(node => [node.ident, node]));
+
+  flights.forEach(function(link) {
+    link.source = ident.get(link.ORIGIN);
+    link.target = ident.get(link.DESTINATION);
+
+    if(link.source.outgoing != undefined) { //VED IKKE HVAD DER ER UNDEFINED
+      link.source.outgoing += link.count;
+      console.log(link.source);
+    }
+  });
+
+
 
   drawAirports(airports);
 
 }
 
-// see airports.csv
-// convert gps coordinates to number and init degree
-function typeAirport(airport) {
-  airport.longitude_deg = parseFloat(airport.longitude_deg);
-  airport.latitude_deg  = parseFloat(airport.latitude_deg);
-
-  // use projection hard-coded to match topojson data
-  const coords = projection([airport.longitude_deg, airport.latitude_deg]);
-  airport.x = coords[0];
-  airport.y = coords[1];
-
-  airport.outgoing = 0;  // eventually tracks number of outgoing flights
-  airport.incoming = 0;  // eventually tracks number of incoming flights
-
-  airport.flights = [];  // eventually tracks outgoing flights
-
-  return airport;
-}
-
-function drawAirports(airports) {
-  // adjust scale
-  //const extent = d3.extent(airports, d => d.outgoing);
-  //scales.airports.domain(extent);
-
-  // draw airport bubbles
-  g.airports.selectAll("circle.airport")
-    .data(airports, d => d.ident)
-    .enter()
-    .append("circle")
-    .attr("r",  5)
-    .attr("cx", d => d.x) // calculated on load
-    .attr("cy", d => d.y) // calculated on load
-    .attr("class", "airport")
-    .each(function(d) {
-      // adds the circle object to our airport
-      // makes it fast to select airports on hover
-      d.bubble = this;
-    });
-}
-
-// draws the underlying map
+// DRAW UNDERLYING MAP
 function drawMap(map) {
   // run topojson on remaining states and adjust projection
   let land = topojson.merge(map, map.objects.states.geometries);
@@ -123,5 +97,47 @@ function drawMap(map) {
 }
 
 
+// see airports.csv
+// convert gps coordinates to number and init degree
+function typeAirport(airport) {
+  airport.longitude_deg = parseFloat(airport.longitude_deg);
+  airport.latitude_deg  = parseFloat(airport.latitude_deg);
 
+  // use projection hard-coded to match topojson data
+  const coords = projection([airport.longitude_deg, airport.latitude_deg]);
+  airport.x = coords[0];
+  airport.y = coords[1];
 
+  airport.outgoing = 0;  // eventually tracks number of outgoing flights
+
+  airport.flights = [];  // eventually tracks outgoing flights
+
+  return airport;
+}
+// see flights.csv
+// convert count to number
+function typeFlight(flight) {
+  flight.count = parseInt(flight.FLIGHTCOUNT);
+  return flight;
+}
+
+function drawAirports(airports) {
+  // adjust scale
+  //const extent = d3.extent(airports, d => d.outgoing);
+  //scales.airports.domain(extent);
+
+  // draw airport bubbles
+  g.airports.selectAll("circle.airport")
+    .data(airports, d => d.ident)
+    .enter()
+    .append("circle")
+    .attr("r",  5)
+    .attr("cx", d => d.x) // calculated on load
+    .attr("cy", d => d.y) // calculated on load
+    .attr("class", "airport")
+    .each(function(d) {
+      // adds the circle object to our airport
+      // makes it fast to select airports on hover
+      d.bubble = this;
+    });
+}
