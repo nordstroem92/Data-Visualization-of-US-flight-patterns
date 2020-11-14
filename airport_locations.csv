@@ -1,0 +1,77 @@
+id,ident,type,name,latitude_deg,longitude_deg
+3632,LAX,large_airport,Los Angeles International Airport,33.942501,-118.407997
+3754,ORD,large_airport,Chicago O'Hare International Airport,41.9786,-87.9048
+3622,JFK,large_airport,John F Kennedy International Airport,40.639801,-73.7789
+3384,ATL,large_airport,Hartsfield Jackson Atlanta International Airport,33.6367,-84.428101
+3878,SFO,large_airport,San Francisco International Airport,37.61899948120117,-122.375
+3521,EWR,large_airport,Newark Liberty International Airport,40.69250106811523,-74.168701171875
+3488,DFW,large_airport,Dallas Fort Worth International Airport,32.896801,-97.038002
+3631,LAS,large_airport,McCarran International Airport,36.08010101,-115.1520004
+3486,DEN,large_airport,Denver International Airport,39.861698150635,-104.672996521
+3643,LGA,large_airport,La Guardia Airport,40.777199,-73.872597
+3602,IAD,large_airport,Washington Dulles International Airport,38.94449997,-77.45580292
+3685,MIA,large_airport,Miami International Airport,25.79319953918457,-80.29060363769531
+3772,PHX,large_airport,Phoenix Sky Harbor International Airport,33.43429946899414,-112.01200103759766
+3422,BOS,large_airport,General Edward Lawrence Logan International Airport,42.36429977,-71.00520325
+3875,SEA,large_airport,Seattle Tacoma International Airport,47.449001,-122.308998
+3771,PHL,large_airport,Philadelphia International Airport,39.87189865112305,-75.24109649658203
+3457,CLT,large_airport,Charlotte Douglas International Airport,35.2140007019043,-80.94309997558594
+3604,IAH,large_airport,George Bush Intercontinental Houston Airport,29.98439979553223,-95.34140014648438
+3497,DTW,large_airport,Detroit Metropolitan Wayne County Airport,42.212398529052734,-83.35340118408203
+3483,DCA,large_airport,Ronald Reagan Washington National Airport,38.8521,-77.037697
+3709,MSP,large_airport,Minneapolis-St Paul International/Wold-Chamberlain Airport,44.882,-93.221802
+3887,SLC,large_airport,Salt Lake City International Airport,40.78839874267578,-111.97799682617188
+3862,SAN,large_airport,San Diego International Airport,32.7336006165,-117.190002441
+3673,MDW,large_airport,Chicago Midway International Airport,41.785999,-87.752403
+3435,BWI,large_airport,Baltimore/Washington International Thurgood Marshall Airport,39.1754,-76.668297
+3531,FLL,large_airport,Fort Lauderdale Hollywood International Airport,26.072599,-80.152702
+3905,STL,large_airport,St Louis Lambert International Airport,38.748697,-90.370003
+5453,HNL,large_airport,Daniel K Inouye International Airport,21.32062,-157.924228
+3768,PDX,large_airport,Portland International Airport,45.58869934,-122.5979996
+3711,MSY,large_airport,Louis Armstrong New Orleans International Airport,29.99340057373047,-90.25800323486328
+3471,CVG,large_airport,Cincinnati Northern Kentucky International Airport,39.048801,-84.667801
+3926,TPA,large_airport,Tampa International Airport,27.975500106811523,-82.533203125
+3420,BNA,large_airport,Nashville International Airport,36.1245002746582,-86.6781997680664
+3778,PIT,large_airport,Pittsburgh International Airport,40.49150085,-80.23290253
+3386,AUS,large_airport,Austin Bergstrom International Airport,30.194499969482425,-97.6698989868164
+3883,SJC,large_airport,Norman Y. Mineta San Jose International Airport,37.362598,-121.929001
+3744,OAK,large_airport,Metropolitan Oakland International Airport,37.721298,-122.221001
+3844,RDU,large_airport,Raleigh Durham International Airport,35.877601623535156,-78.7874984741211
+3675,MEM,large_airport,Memphis International Airport,35.04240036010742,-89.97669982910156
+3863,SAT,large_airport,San Antonio International Airport,29.533701,-98.469803
+3668,MCI,large_airport,Kansas City International Airport,39.2976,-94.713898
+3588,HOU,large_airport,William P Hobby Airport,29.64539909,-95.27890015
+3894,SNA,large_airport,John Wayne Airport-Orange County Airport,33.67570114,-117.8679962
+3454,CLE,large_airport,Cleveland Hopkins International Airport,41.411701202399996,-81.8498001099
+3479,DAL,large_airport,Dallas Love Field,32.847099,-96.851799
+3610,IND,large_airport,Indianapolis International Airport,39.7173,-86.294403
+16091,ABQ,large_airport,Albuquerque International Sunport,35.040199,-106.609001
+3690,MKE,large_airport,General Mitchell International Airport,42.94720077514648,-87.89659881591797
+3932,TUS,large_airport,Tucson International Airport / Morris Air National Guard Base,32.115004,-110.938053
+3396,BDL,large_airport,Bradley International Airport,41.9388999939,-72.68319702149999
+3431,BUF,large_airport,Buffalo Niagara International Airport,42.94049835,-78.73220062
+3620,JAX,large_airport,Jacksonville International Airport,30.49410057067871,-81.68789672851562
+5388,ANC,large_airport,Ted Stevens Anchorage International Airport,61.174400329589844,-149.99600219726562
+3892,SMF,large_airport,Sacramento International Airport,38.69540023803711,-121.59100341796876
+3751,OMA,large_airport,Eppley Airfield,41.3032,-95.894096
+3795,PVD,large_airport,Theodore Francis Green State Airport,41.732601,-71.42040300000002
+3766,PBI,large_airport,Palm Beach International Airport,26.68320083618164,-80.09559631347656
+3873,SDF,large_airport,Louisville Muhammad Ali International Airport,38.1744,-85.736
+3406,BHM,large_airport,Birmingham-Shuttlesworth International Airport,33.56290054,-86.75350189
+3752,ONT,large_airport,Ontario International Airport,34.05599975585937,-117.60099792480469
+3481,DAY,large_airport,James M Cox Dayton International Airport,39.90240097045898,-84.21939849853516
+3858,RSW,large_airport,Southwest Florida International Airport,26.53619956970215,-81.75520324707031
+3684,MHT,large_airport,Manchester-Boston Regional Airport,42.932598,-71.435699
+3876,SFB,large_airport,Orlando Sanford International Airport,28.7775993347168,-81.23750305175781
+3845,RFD,large_airport,Chicago Rockford International Airport,42.19540023803711,-89.09719848632812
+3432,BUR,medium_airport,Bob Hope Airport,34.20069885253906,-118.35900115966797
+3575,GYY,medium_airport,Gary Chicago International Airport,41.61629867553711,-87.41280364990234
+3589,HPN,medium_airport,Westchester County Airport,41.06700134277344,-73.70760345458984
+3616,ISP,medium_airport,Long Island Mac Arthur Airport,40.79520035,-73.10019684
+3644,LGB,medium_airport,Long Beach Airport (Daugherty Field),33.817699,-118.152
+5455,HOG,medium_airport,Kahului Airport,20.8986,-156.429993
+20785,OXR,medium_airport,Oxnard Airport,34.200801849365,-119.20700073242
+3792,PSP,medium_airport,Palm Springs International Airport,33.8297004699707,-116.50700378417969
+3911,SWF,medium_airport,New York Stewart International Airport,41.504101,-74.104797
+3920,TEB,medium_airport,Teterboro Airport,40.85010147089999,-74.060798645
+21333,VNY,medium_airport,Van Nuys Airport,34.209800720215,-118.48999786377
