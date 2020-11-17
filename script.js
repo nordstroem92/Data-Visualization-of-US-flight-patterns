@@ -20,7 +20,7 @@ const hypotenuse = Math.sqrt(width * width + height * height);
 
 // must be hard-coded to match our topojson projection
 // source: https://github.com/topojson/us-atlas
-const projection = d3.geoAlbers().scale(1280).translate([480, 300]);
+const projection = d3.geoAlbers().scale(1280).translate([480, 300]); 
 
 const scales = {
   // used to scale airport bubbles
@@ -80,6 +80,7 @@ function processData(values) {
 
 // DRAW UNDERLYING MAP
 function drawMap(map) {
+  map.objects.states.geometries = map.objects.states.geometries.filter(isContinental);
   // run topojson on remaining states and adjust projection
   let land = topojson.merge(map, map.objects.states.geometries);
 
@@ -345,4 +346,9 @@ function drawPolygons(airports) {
 
       d3.select("text#tooltip").style("visibility", "hidden");
     })
+}
+
+function isContinental(state) {
+  const id = parseInt(state.id);
+  return id < 60 && id !== 2 && id !== 15;
 }
