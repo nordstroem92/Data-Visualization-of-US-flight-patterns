@@ -9,7 +9,7 @@ const urls = {
 
   // source: https://gist.github.com/mbostock/7608400
   flights:
-    "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/merged_flight_data.csv"
+    "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/flights_2018.csv"
 };
 
 const svg  = d3.select("svg");
