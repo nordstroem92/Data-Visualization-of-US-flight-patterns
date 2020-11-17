@@ -5,11 +5,11 @@ const urls = {
 
   // source: https://gist.github.com/mbostock/7608400
   airports:
-    "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/airport_locations.csv",
+    "https://raw.githubusercontent.com/nordstroem92/datavisualisering/0d8f1a272123aef9e6a6e8c911b837aebfcf2aa7/Data/airport_locations.csv",
 
   // source: https://gist.github.com/mbostock/7608400
   flights:
-    "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/flights_2018.csv"
+    "https://raw.githubusercontent.com/nordstroem92/datavisualisering/0d8f1a272123aef9e6a6e8c911b837aebfcf2aa7/Data/flights_2018.csv"
 };
 
 const svg  = d3.select("svg");
@@ -71,7 +71,6 @@ function processData(values) {
   });
 
   flights = flights.filter(flight => flight.DATE > '2018-01-05' && flight.DATE < '2018-01-10');
-  flights = flights.filter(flight => flight.FLIGHTCOUNT > 1);
 
   drawAirports(airports);
   drawFlights(airports, flights);
