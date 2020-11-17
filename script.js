@@ -71,9 +71,11 @@ function processData(values) {
   });
 
   flights = flights.filter(flight => flight.DATE > '2018-01-05' && flight.DATE < '2018-01-10');
+  flights = flights.filter(flight => flight.FLIGHTCOUNT > 1);
 
   drawAirports(airports);
   drawFlights(airports, flights);
+  drawPolygons(airports);
 }
 
 // DRAW UNDERLYING MAP
@@ -173,7 +175,7 @@ function drawFlights(airports, flights) {
     .alphaDecay(0.5)
     // nearby nodes attract each other
     .force("charge", d3.forceManyBody()
-      .strength(8) 
+      .strength(3) 
       .distanceMax(scales.airports.range()[1] * 3)
     )
     // edges want to be as short as possible
@@ -272,4 +274,75 @@ function distance(source, target) {
 
   return Math.sqrt(dx2 + dy2);
 
+}
+
+function drawPolygons(airports) {
+  // convert array of airports into geojson format
+  const geojson = airports.map(function(airport) {
+    return {
+      type: "Feature",
+      properties: airport,
+      geometry: {
+        type: "Point",
+        coordinates: [airport.longitude_deg, airport.latitude_deg]
+      }
+    };
+  });
+
+  // calculate voronoi polygons
+  const polygons = d3.geoVoronoi().polygons(geojson);
+  console.log(polygons);
+
+  g.voronoi.selectAll("path")
+    .data(polygons.features)
+    .enter()
+    .append("path")
+    .attr("d", d3.geoPath(projection))
+    .attr("class", "voronoi")
+    .on("mouseover", function(d) {
+      let airport = d.properties.site.properties;
+
+      d3.select(airport.bubble)
+        .classed("highlight", true);
+
+      d3.selectAll(airport.flights)
+        .classed("highlight", true)
+        .raise();
+
+      // make tooltip take up space but keep it invisible
+      tooltip.style("display", null);
+      tooltip.style("visibility", "hidden");
+
+      // set default tooltip positioning
+      tooltip.attr("text-anchor", "middle");
+      tooltip.attr("dy", 5);
+      tooltip.attr("x", airport.x);
+      tooltip.attr("y", airport.y);
+
+      // set the tooltip text
+      tooltip.text(airport.name);
+
+      // double check if the anchor needs to be changed
+      let bbox = tooltip.node().getBBox();
+
+      if (bbox.x <= 0) {
+        tooltip.attr("text-anchor", "start");
+      }
+      else if (bbox.x + bbox.width >= width) {
+        tooltip.attr("text-anchor", "end");
+      }
+
+      tooltip.style("visibility", "visible");
+    })
+    .on("mouseout", function(d) {
+      let airport = d.properties.site.properties;
+
+      d3.select(airport.bubble)
+        .classed("highlight", false);
+
+      d3.selectAll(airport.flights)
+        .classed("highlight", false);
+
+      d3.select("text#tooltip").style("visibility", "hidden");
+    })
 }
