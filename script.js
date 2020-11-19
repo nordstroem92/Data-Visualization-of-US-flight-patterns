@@ -5,11 +5,11 @@ const urls = {
 
   // source: https://gist.github.com/mbostock/7608400
   airports:
-    "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/airport_locations.csv",
+    "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/airport_locations.csv",
 
   // source: https://gist.github.com/mbostock/7608400
   flights:
-    "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/flights_2018.csv"
+    "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/flights_2018.csv"
 };
 
 const svg  = d3.select("svg");
