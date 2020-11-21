@@ -1,5 +1,5 @@
 class DataSet {
-    static ALL_DAYS = [1, 2, 3, 4, 5, 6];
+    static ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];
     static WEEKDAYS = [1, 2, 3, 4, 5]; // Monday - Friday
     static WEEKENDS = [6, 0]; // Saturday - Sunday
     static AGGREGATION_TYPES = {
@@ -31,8 +31,10 @@ class DataSet {
                     let d = data[i];
                     d.DATE = parseDate(d.DATE);
                 }
+                this.year = data[0].DATE.getFullYear();
                 return data;
             });
+
 
         this.refresh();
     }
@@ -82,6 +84,9 @@ class DataSet {
         let startDate = DataSet.DATE_RANGE.startDate;
         let endDate = DataSet.DATE_RANGE.endDate;
         if (this.lastDateRange.startDate === startDate && this.lastDateRange.endDate === endDate) return;
+
+        startDate.setFullYear(this.year);
+        endDate.setFullYear(this.year);
 
         this.timeFiltered = this.rawData.then(data => data.filter(d => d.DATE >= startDate && d.DATE <= endDate));
         this.rawData.then(() => this.lastDateRange = {"startDate": startDate, "endDate": endDate});
