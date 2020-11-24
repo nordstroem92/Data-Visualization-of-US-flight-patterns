@@ -58,3 +58,17 @@ g#voronoi {
   fill: white;
   text-shadow: 1px 1px 0 #252525, 1px -1px 0 #252525, -1px 1px 0 #252525, -1px -1px 0 #252525;
 }
+
+/*Style tilføjet af Christian*/
+.input-container{
+  text-align: left;
+  padding: 20px;
+}
+
+.slider-input-label { 
+  margin-block-start: 5px;
+  margin-block-end: 5px;
+}
+.slider-input { 
+  width: 250px;
+}
