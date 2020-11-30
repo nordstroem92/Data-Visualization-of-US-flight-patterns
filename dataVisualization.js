@@ -5,6 +5,7 @@ class DaVi {
     flights_2018: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/0d8f1a272123aef9e6a6e8c911b837aebfcf2aa7/Data/flights_2018.csv",
     flights_2019: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/0d8f1a272123aef9e6a6e8c911b837aebfcf2aa7/Data/flights_2019.csv",
     flights_2020: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/0d8f1a272123aef9e6a6e8c911b837aebfcf2aa7/Data/flights_2020.csv" ,
+    flights_test: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/flights_test.csv"
   };
   static width  = 960;
   static height = 600;
@@ -39,7 +40,7 @@ class DaVi {
     this.airports = values[0];
     let flights = values[1];
 
-    flights = flights.filter(flight => flight.DATE > '2018-01-05' && flight.DATE < '2018-01-08' && flight.FLIGHTCOUNT == 15 || flight.DATE > '2019-01-05' && flight.DATE < '2019-01-08' && flight.FLIGHTCOUNT == 15);
+    flights = flights.filter(flight => flight.DATE > '2018-01-01' && flight.DATE < '2018-01-06');
 
     this.createLinks(flights);
     this.drawAirports();
@@ -101,25 +102,26 @@ class DaVi {
        .y(airport => airport.y);
    
       let links = this.g.flights.selectAll("path.flight")
-       .data(bundle.paths)
+       .data(bundle.paths, d => d.paths)
        .enter()
        .append("path")
        .attr("d", line)
        .attr("class", "flight")
-       .attr("stroke-width", "2px")
+       .attr("stroke-width", d => d.length/4)
+       .attr("stroke", d => "rgb(0,0,"+(255-(d.length*20))+")")
        .each(function(d) {
          d[0].flights.push(this); // adds the path object to our source airport, makes it fast to select outgoing paths
        });
    
      let layout = d3.forceSimulation() // https://github.com/d3/d3-force
-       .alphaDecay(0.3) // settle at a layout faster
+       .alphaDecay(0.8) // settle at a layout faster
    
        .force("charge", d3.forceManyBody() // nearby nodes attract each other
-         .strength(20)
-         .distanceMax(DaVi.scales.airports.range()[1] * 100)
+         .strength(10)
+         .distanceMax(DaVi.scales.airports.range()[1] * 50)
        )
        .force("link", d3.forceLink() // edges want to be as short as possible, prevents too much stretching
-         .strength(0.5)
+         .strength(0.3)
          .distance(0)
        )
        .on("tick", function(d) {
@@ -221,6 +223,7 @@ class DaVi {
     bundle.nodes = nodes.map(function(d, i) {
       d.fx = d.x;
       d.fy = d.y;
+      console.log(d);
       return d;
     });
   
@@ -274,8 +277,8 @@ class DaVi {
       });
   
       bundle.paths.push(local);
-    });
-  
+    });                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+    //console.log(bundle);
     return bundle;
   }
 }

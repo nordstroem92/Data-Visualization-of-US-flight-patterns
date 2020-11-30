@@ -26,7 +26,6 @@ id,ident,type,name,latitude_deg,longitude_deg
 3435,BWI,large_airport,Baltimore/Washington International Thurgood Marshall Airport,39.1754,-76.668297
 3531,FLL,large_airport,Fort Lauderdale Hollywood International Airport,26.072599,-80.152702
 3905,STL,large_airport,St Louis Lambert International Airport,38.748697,-90.370003
-5453,HNL,large_airport,Daniel K Inouye International Airport,21.32062,-157.924228
 3768,PDX,large_airport,Portland International Airport,45.58869934,-122.5979996
 3711,MSY,large_airport,Louis Armstrong New Orleans International Airport,29.99340057373047,-90.25800323486328
 3471,CVG,large_airport,Cincinnati Northern Kentucky International Airport,39.048801,-84.667801
@@ -51,7 +50,6 @@ id,ident,type,name,latitude_deg,longitude_deg
 3396,BDL,large_airport,Bradley International Airport,41.9388999939,-72.68319702149999
 3431,BUF,large_airport,Buffalo Niagara International Airport,42.94049835,-78.73220062
 3620,JAX,large_airport,Jacksonville International Airport,30.49410057067871,-81.68789672851562
-5388,ANC,large_airport,Ted Stevens Anchorage International Airport,61.174400329589844,-149.99600219726562
 3892,SMF,large_airport,Sacramento International Airport,38.69540023803711,-121.59100341796876
 3751,OMA,large_airport,Eppley Airfield,41.3032,-95.894096
 3795,PVD,large_airport,Theodore Francis Green State Airport,41.732601,-71.42040300000002
@@ -69,10 +67,8 @@ id,ident,type,name,latitude_deg,longitude_deg
 3589,HPN,medium_airport,Westchester County Airport,41.06700134277344,-73.70760345458984
 3616,ISP,medium_airport,Long Island Mac Arthur Airport,40.79520035,-73.10019684
 3644,LGB,medium_airport,Long Beach Airport (Daugherty Field),33.817699,-118.152
-5455,OGG,medium_airport,Kahului Airport,20.8986,-156.429993
 20785,OXR,medium_airport,Oxnard Airport,34.200801849365,-119.20700073242
 3792,PSP,medium_airport,Palm Springs International Airport,33.8297004699707,-116.50700378417969
 3911,SWF,medium_airport,New York Stewart International Airport,41.504101,-74.104797
 3920,TEB,medium_airport,Teterboro Airport,40.85010147089999,-74.060798645
 21333,VNY,medium_airport,Van Nuys Airport,34.209800720215,-118.48999786377
-12345,SJU,medium_airport,Luis Muñoz Marín International Airport,18.439167,-66.001944
