@@ -66,10 +66,11 @@ class DataSet {
     }
 
     filterByAll() {
-        let startDate = DataSet.DATE_RANGE.startDate;
-        let endDate = DataSet.DATE_RANGE.endDate;
+        let startDate = new Date(DataSet.DATE_RANGE.startDate.getTime());
+        let endDate = new Date(DataSet.DATE_RANGE.endDate.getTime());
         startDate.setFullYear(this.year);
         endDate.setFullYear(this.year);
+        let year = this.year;
 
         let days = DataSet.DAYS_OF_WEEK;
 
@@ -81,6 +82,8 @@ class DataSet {
             let aggregatedData = []
             for (let i = 0; i < data.length; i++) {
                 let flight = data[i];
+
+                if(startDate.getFullYear() !== year || endDate.getFullYear() !== year) console.log(console.log(startDate, endDate));
 
                 let dateFilter = flight.DATE >= startDate && flight.DATE <= endDate;
                 let dayOfWeekFilter = days.includes(flight.DATE.getDay())
