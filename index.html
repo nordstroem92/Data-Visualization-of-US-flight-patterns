@@ -1,0 +1,42 @@
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+
+<head>
+  <meta charset="utf-8">
+  <title>Flight Paths using Edge Bundling</title>
+
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="https://unpkg.com/topojson@3"></script>
+  <script src="https://unpkg.com/d3-delaunay@4"></script>
+  <script src="https://unpkg.com/d3-geo-voronoi@1"></script>
+  <script src="dataProcessing.js"></script>
+
+  <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- must be 960x600 to match topojson us atlas files -->
+<svg id="svg_flights_2018" width="960" height="600">
+  <!-- must be in this order for drawing -->
+  <g class="basemap"></g>
+  <g class="flights"></g>
+  <g class="airports"></g>
+  <g class="voronoi"></g>
+  <text id="tooltip" style="display: none;"></text>
+</svg>
+<svg id="svg_flights_2019" width="960" height="600">
+  <!-- must be in this order for drawing -->
+  <g class="basemap"></g>
+  <g class="flights"></g>
+  <g class="airports"></g>
+  <g class="voronoi"></g>
+  <text id="tooltip" style="display: none;"></text>
+</svg>
+
+<button onclick="update()">Update map</button>
+
+<script src="dataVisualization.js"></script>
+<script src="script.js"></script >
+
+</body>
+</html>

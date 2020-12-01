@@ -17,7 +17,8 @@ class DataSet {
         this.aggregated = null;
 
 
-        this.rawData = d3.csv("Data/" + fileName)
+        //this.rawData = d3.csv("Data/" + fileName)
+        this.rawData = d3.csv(fileName)
             .then(data => {
                 for (let i = 0; i < data.length; i++) {
                     let d = data[i];
@@ -238,8 +239,8 @@ function test() {
     DataSet.setDateRange({"startDate": new Date("2018-08-30"), "endDate": new Date("2018-08-31")});
     DataSet.setGeoAreaFilter({"geoArea": ["DEN", "ORD", "ATL"], "checkOrigin": false, "checkDestination": true});
 
-    let data = new DataSet("flights_2018.csv");
-    //data.refresh();
+    let data = new DataSet("https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/flights_2018.csv");
+    data.refresh();
     return data;
 }
 
