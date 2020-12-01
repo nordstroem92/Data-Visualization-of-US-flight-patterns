@@ -14,6 +14,8 @@ const urls = {
 
 const svg  = d3.select("svg");
 
+
+
 const width  = parseInt(svg.attr("width"));
 const height = parseInt(svg.attr("height"));
 const hypotenuse = Math.sqrt(width * width + height * height);
@@ -115,6 +117,7 @@ function drawAirports(airports) {
     .attr("cx", d => d.x) // calculated on load
     .attr("cy", d => d.y) // calculated on load
     .attr("class", "airport")
+    .attr("id", d => d.ident)
     .each(function(d) {
       // adds the circle object to our airport
       // makes it fast to select airports on hover
@@ -189,6 +192,12 @@ function drawFlights(airports, flights) {
     })
     .on("end", function(d) {
       console.log("layout complete");
+      let brush2 = d3.brush()
+          .extent([[0, 0], [g.airports._parents[0].clientWidth, g.airports._parents[0].clientHeight]])
+          .on("brush end", brushed2);
+      g.voronoi.append("g")
+          .attr("class", "brush")
+          .call(brush2)
     });
 
   layout.nodes(bundle.nodes).force("link").links(bundle.links);
@@ -344,10 +353,34 @@ function drawPolygons(airports) {
         .classed("highlight", false);
 
       d3.select("text#tooltip").style("visibility", "hidden");
-    })
+    });
 }
 
 function isContinental(state) {
   const id = parseInt(state.id);
   return id < 60 && id !== 2 && id !== 15;
 }
+
+function brushed2() {
+  let selection = d3.select("rect.selection").node();
+  if(selection == null) return;
+  let selectedAirports = [];
+  let circles = g.airports.selectAll("circle.airport").nodes();
+  circles.forEach((circle) => {
+    let bbox = circle.__data__.bubble.getBoundingClientRect();
+    let cx = bbox.x;
+    let cy = bbox.y;
+
+    let bboxSelection = selection.getBoundingClientRect();
+    let rectX = bboxSelection.x;
+    let rectY = bboxSelection.y;
+    
+    if(cx >= rectX && cx <= rectX + bboxSelection.width &&
+        cy >= rectY && cy <= rectY + bboxSelection.height) {
+      selectedAirports.push(circle.id);
+    }
+  });
+  console.log(selectedAirports);
+}
+
+
