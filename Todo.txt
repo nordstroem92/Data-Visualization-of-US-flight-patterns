@@ -1,5 +1,0 @@
-[] ret stroke thikness
-[] edge bundling på vægt
-[x] ret labels højde
-[] fix labels på hvert kort
-[] corona antal
