@@ -29,11 +29,9 @@ class DaVi {
     d3.csv(DaVi.urls.airports, typeAirport).then(data => this.initSetup(data, this.flights)) 
   }
 
-  initSetup(airports, flights_data) { // process airport and flight data
+  initSetup(airports, flight_data) { // process airport and flight data
     this.airports = airports;
-    let flights = flights_data;
-
-    this.updateMap(flights);
+    this.updateMap(flight_data);
   }
 
   updateMap(flights){
@@ -83,7 +81,7 @@ class DaVi {
   drawFlights(flights) {
      this.g.flights.selectAll("path.flight").remove(); 
      let bundle = this.generateSegments(this.airports, flights); // break each flight between airports into multiple segments
-   
+
      let line = d3.line() // https://github.com/d3/d3-shape#curveBundle
        .curve(d3.curveBundle)
        .x(airport => airport.x)
@@ -105,11 +103,11 @@ class DaVi {
        .alphaDecay(0.8) // settle at a layout faster
    
        .force("charge", d3.forceManyBody() // nearby nodes attract each other
-         .strength(10)
-         .distanceMax(DaVi.scales.airports.range()[1] * 10)
+         .strength(d => d.outgoing/2)
+         .distanceMax(DaVi.scales.airports.range()[1] * 100)
        )
        .force("link", d3.forceLink() // edges want to be as short as possible, prevents too much stretching
-         .strength(0.3)
+         .strength(d => d.weight/250)
          .distance(0)
        )
        .on("tick", function(d) {
@@ -201,7 +199,7 @@ class DaVi {
         d3.select("text#tooltip").style("visibility", "hidden");
       })
   }
-  generateSegments(nodes, links) {
+  generateSegments(nodes, links) { //this.airports, flights
     // generate separate graph for edge bundling
     // nodes: all nodes including control nodes
     // links: all individual segments (source to target)
@@ -221,6 +219,8 @@ class DaVi {
   
       // calculate total number of inner nodes for this link
       let total = Math.round(DaVi.scales.segments(length));
+      
+      let weight = d.FLIGHTCOUNT; //tilføjet af chris
 
       // create scales from source to target
       let xscale = d3.scaleLinear()
@@ -250,7 +250,8 @@ class DaVi {
   
         bundle.links.push({
           source: source,
-          target: target
+          target: target,
+          weight: weight
         });
   
         source = target;
@@ -260,11 +261,13 @@ class DaVi {
       // add last link to target node
       bundle.links.push({
         source: target,
-        target: d.target
+        target: d.target,
+        weight: weight
       });
   
       bundle.paths.push(local);
     });
+    console.log(bundle.nodes);
     return bundle;
   }
 }
