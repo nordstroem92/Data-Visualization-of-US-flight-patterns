@@ -114,7 +114,7 @@ class DaVi {
        });
    
      let layout = d3.forceSimulation() // https://github.com/d3/d3-force
-       .alphaDecay(0.8) // settle at a layout faster
+       .alphaDecay(1) // settle at a layout faster
    
        .force("charge", d3.forceManyBody() // nearby nodes attract each other
          .strength(10)

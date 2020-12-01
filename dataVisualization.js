@@ -1,11 +1,7 @@
 class DaVi {
   static urls = {
     map: "https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json", // source: https://github.com/topojson/us-atlas
-    airports: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/0d8f1a272123aef9e6a6e8c911b837aebfcf2aa7/Data/airport_locations.csv", // source: https://gist.github.com/mbostock/7608400
-    flights_2018: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/0d8f1a272123aef9e6a6e8c911b837aebfcf2aa7/Data/flights_2018.csv",
-    flights_2019: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/0d8f1a272123aef9e6a6e8c911b837aebfcf2aa7/Data/flights_2019.csv",
-    flights_2020: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/0d8f1a272123aef9e6a6e8c911b837aebfcf2aa7/Data/flights_2020.csv" ,
-    flights_test: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/flights_test.csv"
+    airports: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/airport_locations.csv", // source: https://gist.github.com/mbostock/7608400
   };
   static width  = 960;
   static height = 600;
@@ -17,9 +13,11 @@ class DaVi {
   };
   static tooltip = d3.select("text#tooltip");
 
-  constructor(svg_id, flights_csv){
+  constructor(svg_id, flights_dataset){
     this.svg  = d3.select(svg_id);
     this.airports;
+    this.flights = flights_dataset;
+
     this.g = { // have these already created for easier drawing
       basemap:  this.svg.select(".basemap"),
       flights:  this.svg.select(".flights"),
@@ -28,20 +26,17 @@ class DaVi {
     };
 
     d3.json(DaVi.urls.map).then(data => this.drawMap(data, this.g.basemap));
-    //d3.csv(DaVi.urls.airports, typeAirport).then(data => this.drawAirports(data, this.g.airports));
-    this.promises = [ // load the airport and flight data together
-      d3.csv(DaVi.urls.airports, typeAirport), 
-      d3.csv(flights_csv)
-    ];
-    Promise.all(this.promises).then(data => this.initSetup(data));
+    d3.csv(DaVi.urls.airports, typeAirport).then(data => this.initSetup(data, this.flights)) 
   }
 
-  initSetup(values) { // process airport and flight data
-    this.airports = values[0];
-    let flights = values[1];
+  initSetup(airports, flights_data) { // process airport and flight data
+    this.airports = airports;
+    let flights = flights_data;
 
-    flights = flights.filter(flight => flight.DATE > '2018-01-01' && flight.DATE < '2018-01-06');
+    this.updateMap(flights);
+  }
 
+  updateMap(flights){
     this.createLinks(flights);
     this.drawAirports();
     this.drawFlights(flights);
@@ -85,13 +80,6 @@ class DaVi {
       });
   }
 
-  updateMap(flights){
-    this.createLinks(flights);
-    this.drawAirports();
-    this.drawFlights(flights);
-    this.drawPolygons();
-  }
-
   drawFlights(flights) {
      this.g.flights.selectAll("path.flight").remove(); 
      let bundle = this.generateSegments(this.airports, flights); // break each flight between airports into multiple segments
@@ -118,7 +106,7 @@ class DaVi {
    
        .force("charge", d3.forceManyBody() // nearby nodes attract each other
          .strength(10)
-         .distanceMax(DaVi.scales.airports.range()[1] * 50)
+         .distanceMax(DaVi.scales.airports.range()[1] * 10)
        )
        .force("link", d3.forceLink() // edges want to be as short as possible, prevents too much stretching
          .strength(0.3)
@@ -137,11 +125,12 @@ class DaVi {
    createLinks(flights){
     let ident = new Map(this.airports.map(node => [node.ident, node]));
     this.airports.forEach(airport => airport.outgoing = 0);
+
     flights.forEach(function(link) {
-      link.source = ident.get(link.ORIGIN);
-      link.target = ident.get(link.DESTINATION);
-      link.source.outgoing += parseInt(link.FLIGHTCOUNT);
-    });
+        link.source = ident.get(link.ORIGIN);
+        link.target = ident.get(link.DESTINATION);
+        link.source.outgoing += parseInt(link.FLIGHTCOUNT);
+    }); 
    }
 
    drawPolygons() {
@@ -223,17 +212,16 @@ class DaVi {
     bundle.nodes = nodes.map(function(d, i) {
       d.fx = d.x;
       d.fy = d.y;
-      console.log(d);
       return d;
     });
   
-    links.forEach(function(d, i) {
+    links.forEach(function(d) {
       // calculate the distance between the source and target
       let length = distance(d.source, d.target);
   
       // calculate total number of inner nodes for this link
       let total = Math.round(DaVi.scales.segments(length));
-  
+
       // create scales from source to target
       let xscale = d3.scaleLinear()
         .domain([0, total + 1]) // source, inner nodes, target
@@ -267,9 +255,8 @@ class DaVi {
   
         source = target;
       }
-  
       local.push(d.target);
-  
+      
       // add last link to target node
       bundle.links.push({
         source: target,
@@ -277,8 +264,7 @@ class DaVi {
       });
   
       bundle.paths.push(local);
-    });                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
-    //console.log(bundle);
+    });
     return bundle;
   }
 }
