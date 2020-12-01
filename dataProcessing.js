@@ -1,25 +1,18 @@
 class DataSet {
-    static ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];
-    static WEEKDAYS = [1, 2, 3, 4, 5]; // Monday - Friday
-    static WEEKENDS = [6, 0]; // Saturday - Sunday
-    static AGGREGATION_TYPES = {
-        "ALL_DAYS": DataSet.ALL_DAYS,
-        "WEEKDAYS": DataSet.WEEKDAYS,
-        "WEEKENDS": DataSet.WEEKENDS,
-        "HOLIDAYS": [],
-        "DAY_OF_WEEK": []
-    };
     static DATE_RANGE = {"startDate": null, "endDate": null};
     static GEO_AREA_FILTER = {"geoArea": [], "checkOrigin": false, "checkDestination": false};
-    static AGGREGATION = null;
+    static DAYS_OF_WEEK = []
+    static parseDate = d3.timeParse('%Y-%m-%d');
 
     constructor(fileName) {
         this.lastDateRange = {"startDate": null, "endDate": null};
         this.lastGeoAreaFilter = {"geoArea": [], "checkOrigin": false, "checkDestination": false};
-        this.lastIntersected = {"geoArea": null, "dateRange": null};
+        this.lastIntersected = {"geoArea": null, "dateRange": null, "dayOfWeek": null};
+        this.lastDayOfWeekFilter = [];
 
         this.timeFiltered = null;
         this.geoAreaFiltered = null;
+        this.dayOfWeekFiltered = null;
         this.filtered = null;
         this.aggregated = null;
 
@@ -27,10 +20,9 @@ class DataSet {
         //this.rawData = d3.csv("Data/" + fileName)
         this.rawData = d3.csv(fileName)
             .then(data => {
-                const parseDate = d3.utcParse('%Y-%m-%d');
                 for (let i = 0; i < data.length; i++) {
                     let d = data[i];
-                    d.DATE = parseDate(d.DATE);
+                    d.DATE = DataSet.parseDate(d.DATE);
                 }
                 this.year = data[0].DATE.getFullYear();
                 return data;
@@ -41,53 +33,84 @@ class DataSet {
     }
 
     intersectData() {
-        if (this.lastIntersected.geoArea === DataSet.GEO_AREA_FILTER && this.lastIntersected.dateRange === DataSet.DATE_RANGE) return;
+        if (this.lastIntersected.geoArea === DataSet.GEO_AREA_FILTER &&
+        this.lastIntersected.dateRange === DataSet.DATE_RANGE &&
+        this.lastIntersected.dayOfWeek === DataSet.DAYS_OF_WEEK) return;
+
         this.filtered = intersect(this.timeFiltered, this.geoAreaFiltered);
+        this.filtered = intersect(this.dayOfWeekFiltered, this.filtered)
         this.filtered.then(() => this.lastIntersected = {
             "geoArea": DataSet.GEO_AREA_FILTER,
-            "dateRange": DataSet.DATE_RANGE
+            "dateRange": DataSet.DATE_RANGE,
+            "daysOfWeek": DataSet.DAYS_OF_WEEK
         });
     }
 
     aggregateData() {
-        let aggregationType = DataSet.AGGREGATION;
         this.intersectData();
 
-        switch (aggregationType) {
-            case "ALL_DAYS":
-            case "DAY_OF_WEEK":
-            case "WEEKDAYS":
-            case "WEEKENDS":
-                this.aggregated = this.filtered.then(function (data) {
-                    let aggregatedData = []
-                    for (let i = 0; i < data.length; i++) {
-                        let flight = data[i];
-                        if (!DataSet.AGGREGATION_TYPES[aggregationType].includes(flight.DATE.getDay())) continue;
-                        let flightIndex = listContainsFlight(aggregatedData, flight);
-                        if (flightIndex !== -1) aggregatedData[flightIndex].FLIGHTCOUNT += parseInt(flight.FLIGHTCOUNT);
-                        else aggregatedData.push({
-                            "ORIGIN": flight.ORIGIN,
-                            "DESTINATION": flight.DESTINATION,
-                            "FLIGHTCOUNT": parseInt(flight.FLIGHTCOUNT)
-                        });
-                    }
-                    return aggregatedData;
+        this.aggregated = this.filtered.then(function (data) {
+            let aggregatedData = []
+            for (let i = 0; i < data.length; i++) {
+                let flight = data[i];
+                let flightIndex = listContainsFlight(aggregatedData, flight);
+                if (flightIndex !== -1) aggregatedData[flightIndex].FLIGHTCOUNT += +flight.FLIGHTCOUNT;
+                else aggregatedData.push({
+                    "ORIGIN": flight.ORIGIN,
+                    "DESTINATION": flight.DESTINATION,
+                    "FLIGHTCOUNT": +flight.FLIGHTCOUNT
                 });
-                break;
-            case "HOLIDAYS":
-                throw "Not yet implemented!"
-            default:
-                throw "INVALID AGGREGATION TYPE: (" + aggregationType + ")!";
-        }
+            }
+            return aggregatedData;
+        });
+    }
+
+    filterByAll() {
+        let startDate = DataSet.DATE_RANGE.startDate;
+        let endDate = DataSet.DATE_RANGE.endDate;
+        startDate.setFullYear(this.year);
+        endDate.setFullYear(this.year);
+
+        let days = DataSet.DAYS_OF_WEEK;
+
+        let geoArea = DataSet.GEO_AREA_FILTER.geoArea;
+        let checkOrigin = DataSet.GEO_AREA_FILTER.checkOrigin;
+        let checkDestination = DataSet.GEO_AREA_FILTER.checkDestination;
+
+        this.aggregated = this.rawData.then(function (data) {
+            let aggregatedData = []
+            for (let i = 0; i < data.length; i++) {
+                let flight = data[i];
+
+                let dateFilter = flight.DATE >= startDate && flight.DATE <= endDate;
+                let dayOfWeekFilter = days.includes(flight.DATE.getDay())
+                let geoFilter = () => {
+                    if (checkOrigin && checkDestination) return (geoArea.includes(flight.ORIGIN) && geoArea.includes(flight.DESINTAION));
+                    if (checkOrigin) return geoArea.includes(flight.ORIGIN);
+                    return geoArea.includes(flight.DESTINATION);
+                }
+                if(!(dateFilter && dayOfWeekFilter && geoFilter())) continue;
+
+                let flightIndex = listContainsFlight(aggregatedData, flight);
+                if (flightIndex !== -1) aggregatedData[flightIndex].FLIGHTCOUNT += +flight.FLIGHTCOUNT;
+                else aggregatedData.push({
+                    "ORIGIN": flight.ORIGIN,
+                    "DESTINATION": flight.DESTINATION,
+                    "FLIGHTCOUNT": +flight.FLIGHTCOUNT
+                });
+            }
+            return aggregatedData;
+        });
+        return this.aggregated;
     }
 
     filterByPeriod() {
         let startDate = DataSet.DATE_RANGE.startDate;
         let endDate = DataSet.DATE_RANGE.endDate;
-        if (this.lastDateRange.startDate === startDate && this.lastDateRange.endDate === endDate) return;
-
         startDate.setFullYear(this.year);
         endDate.setFullYear(this.year);
+
+        if (this.lastDateRange.startDate === startDate && this.lastDateRange.endDate === endDate) return;
 
         this.timeFiltered = this.rawData.then(data => data.filter(d => d.DATE >= startDate && d.DATE <= endDate));
         this.rawData.then(() => this.lastDateRange = {"startDate": startDate, "endDate": endDate});
@@ -114,6 +137,18 @@ class DataSet {
         };
     }
 
+    filterByDayOfWeek() {
+        let days = DataSet.DAYS_OF_WEEK;
+        if (this.lastDayOfWeekFilter === days) return;
+
+        this.dayOfWeekFiltered = this.rawData.then(function (data) {
+            return data.filter(function (flight) {
+                return days.includes(flight.DATE.getDay())
+            });
+        });
+        this.lastDayOfWeekFilter = days;
+    }
+
     getAreaFilteredDate() {
         return this.geoAreaFiltered;
     }
@@ -127,7 +162,7 @@ class DataSet {
     }
 
     static setDaysOfWeek(daysOfWeek) {
-        DataSet.AGGREGATION_TYPES.DAY_OF_WEEK = daysOfWeek;
+        DataSet.DAYS_OF_WEEK = daysOfWeek;
     }
 
     static setDateRange(dateRange) {
@@ -138,15 +173,23 @@ class DataSet {
         DataSet.GEO_AREA_FILTER = geoFilter;
     }
 
-    static setAggregationType(aggregationType) {
-        DataSet.AGGREGATION = aggregationType;
-    }
-
     getData() {
         return this.aggregated;
     }
 
     refresh() {
+        return this.rawData
+            .then(() => {
+                return new Promise((resolve) => {
+                    resolve(this.filterByAll());
+                });
+            })
+            .then(() => {
+                return this.getData()
+            });
+    }
+
+    refresh_old() {
         return this.rawData
             .then(() => {
                 return new Promise((resolve) => {
@@ -160,6 +203,11 @@ class DataSet {
             })
             .then(() => {
                 return new Promise((resolve) => {
+                    resolve(this.filterByDayOfWeek());
+                });
+            })
+            .then(() => {
+                return new Promise((resolve) => {
                     resolve(this.aggregateData());
                 });
             })
@@ -167,6 +215,52 @@ class DataSet {
                 return this.getData()
             });
     }
+
+    getFlightCount(){
+        return this.rawData.then(function (data) {
+            let aggregatedData = {};
+            let asList = []
+            for (let i = 0; i < data.length; i++) {
+                let flight = data[i];
+                let time = flight.DATE.getTime();
+                if(aggregatedData.hasOwnProperty(time)) aggregatedData[time] += +flight.FLIGHTCOUNT;
+                else aggregatedData[time] = +flight.FLIGHTCOUNT;
+            }
+
+            let keys = Object.keys(aggregatedData);
+            for(let i = 0; i < keys.length; i++){
+                let key = keys[i];
+                asList.push({
+                    "DATE": new Date(+key),
+                    "FLIGHTCOUNT": aggregatedData[key]
+                });
+            }
+            asList.sort((a, b) => {
+                return a.DATE - b.DATE;
+            })
+            //return asList;
+
+            let contents = "DATE, FLIGHTCOUNT\n"
+            for(let i = 0; i < asList.length; i++){
+                contents += asList[i].DATE.getTime() + "," + asList[i].FLIGHTCOUNT + "\n"
+            }
+            return contents;
+
+        });
+    }
+
+    readSum(){
+        let startTime = (new Date()).getTime();
+        return d3.csv("Data/sum_flights_" + this.year + ".csv").then((data) => {
+            for (let i = 0; i < data.length; i++) {
+                data[i].DATE = new Date(+data[i].DATE);
+            }
+            return data;
+        })
+    }
+
+
+
 }
 
 
@@ -175,8 +269,8 @@ class DataSet {
 function intersect(filter1, filter2) {
     return filter1.then(function (data1) {
         return filter2.then(function (data2) {
-            return data2.filter(function (d) {
-                return data1.includes(d);
+            return data2.filter((d2) => {
+                return data1.includes(d2);
             });
         });
     });
@@ -192,7 +286,7 @@ function listContainsFlight(list, flight) {
 
 
 function test() {
-    DataSet.setAggregationType("WEEKENDS");
+    DataSet.setDaysOfWeek([1, 2, 3, 4, 5, 6, 0]) // all days
     DataSet.setDateRange({"startDate": new Date("2018-08-30"), "endDate": new Date("2018-08-31")});
     DataSet.setGeoAreaFilter({"geoArea": ["DEN", "ORD", "ATL"], "checkOrigin": false, "checkDestination": true});
 
@@ -200,3 +294,4 @@ function test() {
     data.refresh();
     return data;
 }
+

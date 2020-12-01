@@ -100,14 +100,14 @@ class DaVi {
        });
    
      let layout = d3.forceSimulation() // https://github.com/d3/d3-force
-       .alphaDecay(0.8) // settle at a layout faster
+       .alphaDecay(0.3) // settle at a layout faster
    
        .force("charge", d3.forceManyBody() // nearby nodes attract each other
          .strength(d => d.outgoing/2)
-         .distanceMax(DaVi.scales.airports.range()[1] * 100)
+         .distanceMax(DaVi.scales.airports.range()[1] * 10)
        )
        .force("link", d3.forceLink() // edges want to be as short as possible, prevents too much stretching
-         .strength(d => d.weight/250)
+         .strength(d => d.weight/7)
          .distance(0)
        )
        .on("tick", function(d) {
