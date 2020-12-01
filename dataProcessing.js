@@ -65,6 +65,45 @@ class DataSet {
         });
     }
 
+    filterByAll() {
+        let startDate = DataSet.DATE_RANGE.startDate;
+        let endDate = DataSet.DATE_RANGE.endDate;
+        startDate.setFullYear(this.year);
+        endDate.setFullYear(this.year);
+
+        let days = DataSet.DAYS_OF_WEEK;
+
+        let geoArea = DataSet.GEO_AREA_FILTER.geoArea;
+        let checkOrigin = DataSet.GEO_AREA_FILTER.checkOrigin;
+        let checkDestination = DataSet.GEO_AREA_FILTER.checkDestination;
+
+        this.aggregated = this.rawData.then(function (data) {
+            let aggregatedData = []
+            for (let i = 0; i < data.length; i++) {
+                let flight = data[i];
+
+                let dateFilter = flight.DATE >= startDate && flight.DATE <= endDate;
+                let dayOfWeekFilter = days.includes(flight.DATE.getDay())
+                let geoFilter = () => {
+                    if (checkOrigin && checkDestination) return (geoArea.includes(flight.ORIGIN) && geoArea.includes(flight.DESINTAION));
+                    if (checkOrigin) return geoArea.includes(flight.ORIGIN);
+                    return geoArea.includes(flight.DESTINATION);
+                }
+                if(!(dateFilter && dayOfWeekFilter && geoFilter())) continue;
+
+                let flightIndex = listContainsFlight(aggregatedData, flight);
+                if (flightIndex !== -1) aggregatedData[flightIndex].FLIGHTCOUNT += +flight.FLIGHTCOUNT;
+                else aggregatedData.push({
+                    "ORIGIN": flight.ORIGIN,
+                    "DESTINATION": flight.DESTINATION,
+                    "FLIGHTCOUNT": +flight.FLIGHTCOUNT
+                });
+            }
+            return aggregatedData;
+        });
+        return this.aggregated;
+    }
+
     filterByPeriod() {
         let startDate = DataSet.DATE_RANGE.startDate;
         let endDate = DataSet.DATE_RANGE.endDate;
@@ -139,6 +178,18 @@ class DataSet {
     }
 
     refresh() {
+        return this.rawData
+            .then(() => {
+                return new Promise((resolve) => {
+                    resolve(this.filterByAll());
+                });
+            })
+            .then(() => {
+                return this.getData()
+            });
+    }
+
+    refresh_old() {
         return this.rawData
             .then(() => {
                 return new Promise((resolve) => {
