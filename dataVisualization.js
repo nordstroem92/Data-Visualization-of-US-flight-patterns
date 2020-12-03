@@ -9,7 +9,9 @@ class DaVi {
   static projection = d3.geoAlbers().scale(1280).translate([480, 300]); // must be hard-coded to match our topojson projection, source: https://github.com/topojson/us-atlas
   static scales = {
     airports: d3.scaleSqrt().range([4, 18]), // used to scale airport bubbles
-    segments: d3.scaleLinear().domain([0, DaVi.hypotenuse]).range([1, 10]) // used to scale number of segments per line
+    segments: d3.scaleLinear().domain([0, DaVi.hypotenuse]).range([1, 10]), // used to scale number of segments per line
+    strengths: d3.scaleLinear().domain([0, 60000]).range([0, 130]),
+    links: d3.scaleLinear().domain([0, 16000]).range([0,1])
   };
   static tooltip = d3.select("text#tooltip");
 
@@ -69,7 +71,7 @@ class DaVi {
       .data(this.airports, d => d.ident)
       .enter()
       .append("circle")
-      .attr("r", 10)
+      .attr("r", 5)
       .attr("cx", d => d.x) // calculated on load
       .attr("cy", d => d.y) // calculated on load
       .attr("class", "airport")
@@ -86,28 +88,28 @@ class DaVi {
        .curve(d3.curveBundle)
        .x(airport => airport.x)
        .y(airport => airport.y);
-   
+
       let links = this.g.flights.selectAll("path.flight")
-       .data(bundle.paths, d => d.paths)
+       .data(bundle.paths)
        .enter()
        .append("path")
        .attr("d", line)
        .attr("class", "flight")
-       .attr("stroke-width", d => d.length/4)
-       .attr("stroke", d => "rgb(0,0,"+(255-(d.length*20))+")")
+       .attr("stroke-width", "1.5px") //d => d.length/3
+       .attr("stroke","rgba(20,20,180,0.95")//d => "rgba(0,0,180,"+(d.length/2)+")")
        .each(function(d) {
          d[0].flights.push(this); // adds the path object to our source airport, makes it fast to select outgoing paths
        });
    
      let layout = d3.forceSimulation() // https://github.com/d3/d3-force
-       .alphaDecay(0.3) // settle at a layout faster
+       .alphaDecay(0.6) // settle at a layout faster
    
        .force("charge", d3.forceManyBody() // nearby nodes attract each other
-         .strength(d => d.outgoing/2)
-         .distanceMax(DaVi.scales.airports.range()[1] * 10)
+         .strength(d => DaVi.scales.strengths(d.outgoing))
+         .distanceMax(1000)
        )
        .force("link", d3.forceLink() // edges want to be as short as possible, prevents too much stretching
-         .strength(d => d.weight/7)
+         .strength(d => DaVi.scales.links(d.weight))
          .distance(0)
        )
        .on("tick", function(d) {
@@ -220,7 +222,7 @@ class DaVi {
       // calculate total number of inner nodes for this link
       let total = Math.round(DaVi.scales.segments(length));
       
-      let weight = d.FLIGHTCOUNT; //tilføjet af chris
+      let weight = d.FLIGHTCOUNT; 
 
       // create scales from source to target
       let xscale = d3.scaleLinear()
@@ -267,7 +269,6 @@ class DaVi {
   
       bundle.paths.push(local);
     });
-    console.log(bundle.nodes);
     return bundle;
   }
 }
