@@ -31,10 +31,12 @@ function setupOnClick() {
     for(let i=0; i<circles.length; i++){
         let circle = circles[i];
         circle.onclick = () => {
-            console.log("clicky")
-            if(selectedAirports.has(circle)) selectedAirports.delete(circle);
-            let circleSelection = d3.select(circle);
-            circleSelection.classed("selected", !circleSelection.classed("selected"));
+            let ident = circle.classList[1];
+            let alreadySelected = selectedAirports.has(ident);
+            let circleSelections = d3.selectAll("."+ident).nodes();
+
+            alreadySelected ? selectedAirports.delete(ident) : selectedAirports.add(ident);
+            setClass(circleSelections, "selected", !alreadySelected);
         }
     }
 }
@@ -48,16 +50,22 @@ onmousemove = function(e) {
 
     div.hidden = 0;
     bboxSelection = getAirportsInSelection();
-    setClass(bboxSelection, "temp-selection", true);
+    for(let i=0; i<bboxSelection.length; i++) {
+        let ident = bboxSelection[i];
+        let circleSelections = d3.selectAll("."+ident).nodes();
+        setClass(circleSelections, "temp-selection", true);
+    }
+
 };
 
 onmouseup = function(e) {
     buttonHeld = false;
     div.hidden = 1;
     for(let i=0; i<bboxSelection.length; i++){
-        let node = bboxSelection[i];
-        selectedAirports.add(node);
-        d3.select(node).classed("selected", true);
+        let ident = bboxSelection[i];
+        selectedAirports.add(ident);
+        let circleSelections = d3.selectAll("."+ident).nodes();
+        setClass(circleSelections, "selected", true);
     }
     bboxSelection = [];
     setClass(d3.selectAll("circle.airport").nodes(), "temp-selection", false);
@@ -77,10 +85,11 @@ function getAirportsInSelection(){
 
     for(let i = 0; i<circles.length; i++){
         let circle = circles[i];
+        let ident = circle.classList[1];
         let c = getCenterOfCircle(circle);
         let xRequirement = c[0] >= selection[0] && c[0] <= selection[1];
         let yRequirement = c[1] >= selection[2] && c[1] <= selection[3];
-        if(xRequirement && yRequirement) inBox.push(circle);
+        if(xRequirement && yRequirement) inBox.push(ident);
     }
 
     return inBox;
@@ -108,8 +117,7 @@ function getSelectedAirportCodes() {
     let airports = Array.from(selectedAirports);
     for(let i=0; i<airports.length; i++){
         let airport = airports[i];
-        let name = airport.id;
-        codes.push(name);
+        codes.push(airport);
     }
     return codes;
 }

@@ -74,8 +74,7 @@ class DaVi {
       .attr("r", 5)
       .attr("cx", d => d.x) // calculated on load
       .attr("cy", d => d.y) // calculated on load
-      .attr("class", "airport")
-      .attr("id", d => d.ident)
+      .attr("class", d => "airport " + d.ident)
       .each(function(d) {
         d.bubble = this; // adds the circle object to our airport, makes it fast to select airports on hover
       })
