@@ -9,7 +9,9 @@ class DaVi {
   static projection = d3.geoAlbers().scale(1280).translate([480, 300]); // must be hard-coded to match our topojson projection, source: https://github.com/topojson/us-atlas
   static scales = {
     airports: d3.scaleSqrt().range([4, 18]), // used to scale airport bubbles
-    segments: d3.scaleLinear().domain([0, DaVi.hypotenuse]).range([1, 10]) // used to scale number of segments per line
+    segments: d3.scaleLinear().domain([0, DaVi.hypotenuse]).range([1, 10]), // used to scale number of segments per line
+    strengths: d3.scaleLinear().domain([0, 60000]).range([0, 130]),
+    links: d3.scaleLinear().domain([0, 16000]).range([0,1])
   };
   static tooltip = d3.select("text#tooltip");
 
@@ -29,11 +31,9 @@ class DaVi {
     d3.csv(DaVi.urls.airports, typeAirport).then(data => this.initSetup(data, this.flights)) 
   }
 
-  initSetup(airports, flights_data) { // process airport and flight data
+  initSetup(airports, flight_data) { // process airport and flight data
     this.airports = airports;
-    let flights = flights_data;
-
-    this.updateMap(flights);
+    this.updateMap(flight_data);
   }
 
   updateMap(flights){
@@ -71,7 +71,7 @@ class DaVi {
       .data(this.airports, d => d.ident)
       .enter()
       .append("circle")
-      .attr("r", 10)
+      .attr("r", 5)
       .attr("cx", d => d.x) // calculated on load
       .attr("cy", d => d.y) // calculated on load
       .attr("class", "airport")
@@ -128,33 +128,33 @@ class DaVi {
   drawFlights(flights) {
      this.g.flights.selectAll("path.flight").remove(); 
      let bundle = this.generateSegments(this.airports, flights); // break each flight between airports into multiple segments
-   
+
      let line = d3.line() // https://github.com/d3/d3-shape#curveBundle
        .curve(d3.curveBundle)
        .x(airport => airport.x)
        .y(airport => airport.y);
-   
+
       let links = this.g.flights.selectAll("path.flight")
-       .data(bundle.paths, d => d.paths)
+       .data(bundle.paths)
        .enter()
        .append("path")
        .attr("d", line)
        .attr("class", "flight")
-       .attr("stroke-width", d => d.length/4)
-       .attr("stroke", d => "rgb(0,0,"+(255-(d.length*20))+")")
+       .attr("stroke-width", "1.5px") //d => d.length/3
+       .attr("stroke","rgba(20,20,180,0.95")//d => "rgba(0,0,180,"+(d.length/2)+")")
        .each(function(d) {
          d[0].flights.push(this); // adds the path object to our source airport, makes it fast to select outgoing paths
        });
    
      let layout = d3.forceSimulation() // https://github.com/d3/d3-force
-       .alphaDecay(0.8) // settle at a layout faster
+       .alphaDecay(0.6) // settle at a layout faster
    
        .force("charge", d3.forceManyBody() // nearby nodes attract each other
-         .strength(10)
-         .distanceMax(DaVi.scales.airports.range()[1] * 10)
+         .strength(d => DaVi.scales.strengths(d.outgoing))
+         .distanceMax(1000)
        )
        .force("link", d3.forceLink() // edges want to be as short as possible, prevents too much stretching
-         .strength(0.3)
+         .strength(d => DaVi.scales.links(d.weight))
          .distance(0)
        )
        .on("tick", function(d) {
@@ -246,7 +246,7 @@ class DaVi {
         d3.select("text#tooltip").style("visibility", "hidden");
       })
   }
-  generateSegments(nodes, links) {
+  generateSegments(nodes, links) { //this.airports, flights
     // generate separate graph for edge bundling
     // nodes: all nodes including control nodes
     // links: all individual segments (source to target)
@@ -266,6 +266,8 @@ class DaVi {
   
       // calculate total number of inner nodes for this link
       let total = Math.round(DaVi.scales.segments(length));
+      
+      let weight = d.FLIGHTCOUNT; 
 
       // create scales from source to target
       let xscale = d3.scaleLinear()
@@ -295,7 +297,8 @@ class DaVi {
   
         bundle.links.push({
           source: source,
-          target: target
+          target: target,
+          weight: weight
         });
   
         source = target;
@@ -305,7 +308,8 @@ class DaVi {
       // add last link to target node
       bundle.links.push({
         source: target,
-        target: d.target
+        target: d.target,
+        weight: weight
       });
   
       bundle.paths.push(local);
