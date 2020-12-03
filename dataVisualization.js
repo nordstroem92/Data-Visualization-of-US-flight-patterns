@@ -40,7 +40,7 @@ class DaVi {
     this.createLinks(flights);
     this.drawAirports();
     this.drawFlights(flights);
-    this.drawPolygons();
+    //this.drawPolygons();
   }
 
   drawMap(map) { // DRAW UNDERLYING MAP
@@ -75,9 +75,54 @@ class DaVi {
       .attr("cx", d => d.x) // calculated on load
       .attr("cy", d => d.y) // calculated on load
       .attr("class", "airport")
+      .attr("id", d => d.ident)
       .each(function(d) {
         d.bubble = this; // adds the circle object to our airport, makes it fast to select airports on hover
-      });
+      })
+      .on("mouseover", function (d) {
+
+            d3.select(this)
+                .classed("highlight", true);
+
+          d3.selectAll(d.flights)
+              .classed("highlight", true)
+              .raise();
+
+            // make tooltip take up space but keep it invisible
+            DaVi.tooltip.style("display", null);
+            DaVi.tooltip.style("visibility", "hidden");
+
+            // set default tooltip positioning
+            DaVi.tooltip.attr("text-anchor", "middle");
+            DaVi.tooltip.attr("dy", -15);
+            DaVi.tooltip.attr("x", d.x);
+            DaVi.tooltip.attr("y", d.y);
+
+            // set the tooltip text
+            DaVi.tooltip.text(d.name);
+
+            // double check if the anchor needs to be changed
+            let bbox = DaVi.tooltip.node().getBBox();
+
+            if (bbox.x <= 0) {
+                DaVi.tooltip.attr("text-anchor", "start");
+            }
+            else if (bbox.x + bbox.width >= DaVi.width) {
+                DaVi.tooltip.attr("text-anchor", "end");
+            }
+
+            DaVi.tooltip.style("visibility", "visible");
+        })
+      .on("mouseout", function(d) {
+            d3.select(this)
+                .classed("highlight", false);
+
+          d3.selectAll(d.flights)
+              .classed("highlight", false);
+
+            d3.select("text#tooltip").style("visibility", "hidden");
+        });
+      setupOnClick();
   }
 
   drawFlights(flights) {

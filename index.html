@@ -21,7 +21,6 @@
   <g class="basemap"></g>
   <g class="flights"></g>
   <g class="airports"></g>
-  <g class="voronoi"></g>
   <text id="tooltip" style="display: none;"></text>
 </svg>
 
@@ -30,7 +29,6 @@
   <g class="basemap"></g>
   <g class="flights"></g>
   <g class="airports"></g>
-  <g class="voronoi"></g>
   <text id="tooltip" style="display: none;"></text>
 </svg>
 
@@ -39,11 +37,8 @@
   <g class="basemap"></g>
   <g class="flights"></g>
   <g class="airports"></g>
-  <g class="voronoi"></g>
   <text id="tooltip" style="display: none;"></text>
 </svg>
-
-<button onclick="update()">Update map</button>
 
 <style> /* set the CSS */
 
@@ -58,31 +53,67 @@
   width: 3px;
 }
 
+.temp-selection {
+  fill: orange;
+}
+
+.selected {
+  fill: red;
+}
+
+#selectionBox {
+  border: 1px dotted #000;
+  position: absolute;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
 </style>
 
 <br>
 
-<button id="updateButton">Update Data</button>
-<div id="days_of_week">
-  <input type="checkbox" id="1" checked>
-  <label for="1">Monday</label><br>
-  <input type="checkbox" id="2" checked>
-  <label for="2">Tuesday</label><br>
-  <input type="checkbox" id="3" checked>
-  <label for="3">Wednesday</label><br>
-  <input type="checkbox" id="4" checked>
-  <label for="4">Thursday</label><br>
-  <input type="checkbox" id="5" checked>
-  <label for="5">Friday</label><br>
-  <input type="checkbox" id="6" checked>
-  <label for="6">Saturday</label><br>
-  <input type="checkbox" id="0" checked>
-  <label for="0">Sunday</label><br><br>
+<button class="noselect" id="updateButton">Update Data</button>
+
+<div class="noselect" id="geo_options">
+  <input type="checkbox" id="checkOrigin" checked>
+  <label class="noselect" for="checkOrigin">Check Destination</label><br>
+  <input type="checkbox" id="checkDestination" checked>
+  <label class="noselect" for="checkDestination">Check Origin</label><br><br>
 </div>
+
+<div class="noselect" id="days_of_week">
+  <input type="checkbox" id="1" checked>
+  <label class="noselect" for="1">Monday</label><br>
+  <input type="checkbox" id="2" checked>
+  <label class="noselect" for="2">Tuesday</label><br>
+  <input type="checkbox" id="3" checked>
+  <label class="noselect" for="3">Wednesday</label><br>
+  <input type="checkbox" id="4" checked>
+  <label class="noselect" for="4">Thursday</label><br>
+  <input type="checkbox" id="5" checked>
+  <label class="noselect" for="5">Friday</label><br>
+  <input type="checkbox" id="6" checked>
+  <label class="noselect" for="6">Saturday</label><br>
+  <input type="checkbox" id="0" checked>
+  <label class="noselect" for="0">Sunday</label><br><br>
+</div>
+
+<div id="selectionBox" hidden></div>
 
 <script src="dataVisualization.js"></script>
 <script src="script.js"></script >
 <script src="dateBrush.js"></script >
+<script src="boundingBoxSelection.js"></script>
+
+
 
 </body>
 </html>
