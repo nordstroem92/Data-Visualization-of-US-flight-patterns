@@ -37,7 +37,6 @@ class DaVi {
   }
 
   updateMap(flights){
-      console.log(flights);
     this.createLinks(flights);
     this.drawAirports();
     this.drawFlights(flights);
@@ -47,7 +46,7 @@ class DaVi {
   drawMap(map) { // DRAW UNDERLYING MAP
     map.objects.states.geometries = map.objects.states.geometries.filter(isContinental);
     let land = topojson.merge(map, map.objects.states.geometries); // run topojson on remaining states and adjust projection
-    console.log(map.objects.states.geometries[0].properties.name);
+    
   
     let path = d3.geoPath(); // use null projection; data is already projected
   
