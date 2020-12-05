@@ -2,6 +2,7 @@ class DaVi {
   static urls = {
     map: "https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json", // source: https://github.com/topojson/us-atlas
     airports: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/airport_locations.csv", // source: https://gist.github.com/mbostock/7608400
+    covid: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/covid_by_state_jan-aug%20.csv"
   };
   static width  = 960;
   static height = 600;
@@ -24,7 +25,12 @@ class DaVi {
       voronoi:  this.svg.select(".voronoi")
     };
 
-    d3.json(DaVi.urls.map).then(data => this.drawMap(data, this.g.basemap));
+    this.promises = [
+      d3.json(DaVi.urls.map),
+      d3.csv(DaVi.urls.covid)
+    ]
+    Promise.all(this.promises).then(data => this.drawMap(data));
+
     d3.csv(DaVi.urls.airports, typeAirport).then(data => this.initSetup(data, flights_dataset))
   }
 
@@ -33,35 +39,40 @@ class DaVi {
     this.updateMap(flight_data);
   }
 
-  updateMap(flight_data){
-    this.flights = flight_data[0];
-    this.totalFlights = flight_data[1];
-    this.maxFlightCount = flight_data[2];
+    updateMap(flight_data){
+        this.flights = flight_data[0];
+        this.totalFlights = flight_data[1];
+        this.maxFlightCount = flight_data[2];
 
-    this.strengths = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0, 25]);
-    this.links = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0,1]);
+        this.strengths = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0, 25]);
+        this.links = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0,1]);
 
-    this.color = d3.scaleLinear()
-        .domain([0, this.maxFlightCount])
-        .range(['#08306b','#08519c','#2171b5','#4292c6','#6baed6','#9ecae1','#c6dbef','#deebf7','#f7fbff'])
-        .interpolate(d3.interpolateHcl);
+        this.color = d3.scaleLinear()
+            .domain([0, this.maxFlightCount])
+            .range(['#08306b','#08519c','#2171b5','#4292c6','#6baed6','#9ecae1','#c6dbef','#deebf7','#f7fbff'])
+            .interpolate(d3.interpolateHcl);
 
-    this.createLinks(this.flights);
-    this.drawAirports();
-    this.drawFlights(this.flights);
-    //this.drawPolygons();
-  }
+        this.createLinks(this.flights);
+        this.drawAirports();
+        this.drawFlights(this.flights);
+        //this.drawPolygons();
+    }
 
-  drawMap(map) { // DRAW UNDERLYING MAP
+  drawMap(values) { // DRAW UNDERLYING MAP
+    let map = values[0];
+    let covid = values[1];
+    map.objects.states.geometries.forEach(d => console.log(d.properties));
+
     map.objects.states.geometries = map.objects.states.geometries.filter(isContinental);
     let land = topojson.merge(map, map.objects.states.geometries); // run topojson on remaining states and adjust projection
-  
+
     let path = d3.geoPath(); // use null projection; data is already projected
   
     this.g.basemap.append("path") // draw base map
       .datum(land)
       .attr("class", "land")
-      .attr("d", path);
+      .attr("d", path)
+      .attr("fill", "#DDDDDD");
   
     this.g.basemap.append("path") // draw interior borders
       .datum(topojson.mesh(map, map.objects.states, (a, b) => a !== b))
@@ -73,7 +84,7 @@ class DaVi {
       .attr("class", "border exterior")
       .attr("d", path);
   }
-  
+
   drawAirports() {
     this.g.airports.selectAll("circle.airport").remove(); 
     this.g.airports.selectAll("circle.airport") // draw airport bubbles
@@ -329,7 +340,6 @@ class DaVi {
       });
       bundle.paths.push(local);
     });
-    //console.log(bundle.paths);
     return bundle;
   }
 }

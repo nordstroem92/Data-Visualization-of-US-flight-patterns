@@ -264,13 +264,15 @@ class DataSet {
 
     static readSum(year){
         let startTime = (new Date()).getTime();
-        return d3.csv("Data/sum_flights_" + year + ".csv").then((data) => {
+        //return d3.csv("Data/sum_flights_" + year + ".csv").then((data) => {
+        return d3.csv("https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/flights_" + year + ".csv").then((data) => {
             for (let i = 0; i < data.length; i++) {
                 data[i].DATE = new Date(+data[i].DATE);
             }
             return data;
         })
     }
+    
 
 
 

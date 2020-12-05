@@ -29,6 +29,7 @@ let y = d3.scaleLinear().range([height2, 0]);
 let valueline = d3.line()
     .x(function(d) {return x(d.DATE);})
     .y(function(d) {return y(+d.FLIGHTCOUNT);});
+    console.log(valueline)
 
 let brush = d3.brushX()
     .extent([[0, 0], [width2, height2]])
