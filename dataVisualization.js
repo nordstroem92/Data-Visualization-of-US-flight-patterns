@@ -10,16 +10,13 @@ class DaVi {
   static projection = d3.geoAlbers().scale(1280).translate([480, 300]); // must be hard-coded to match our topojson projection, source: https://github.com/topojson/us-atlas
   static scales = {
     airports: d3.scaleSqrt().range([4, 18]), // used to scale airport bubbles
-    segments: d3.scaleLinear().domain([0, DaVi.hypotenuse]).range([1, 10]), // used to scale number of segments per line
-    strengths: d3.scaleLinear().domain([0, 60000]).range([0, 130]),
-    links: d3.scaleLinear().domain([0, 16000]).range([0,1])
+    segments: d3.scaleLinear().domain([0, DaVi.hypotenuse]).range([1, 10]) // used to scale number of segments per line
   };
   static tooltip = d3.select("text#tooltip");
 
   constructor(svg_id, flights_dataset){
     this.svg  = d3.select(svg_id);
     this.airports;
-    this.flights = flights_dataset;
 
     this.g = { // have these already created for easier drawing
       basemap:  this.svg.select(".basemap"),
@@ -28,27 +25,38 @@ class DaVi {
       voronoi:  this.svg.select(".voronoi")
     };
 
-    this.promises = [   
+    this.promises = [
       d3.json(DaVi.urls.map),
       d3.csv(DaVi.urls.covid)
     ]
     Promise.all(this.promises).then(data => this.drawMap(data));
 
-    d3.csv(DaVi.urls.airports, typeAirport).then(data => this.initSetup(data, this.flights)) 
+    d3.csv(DaVi.urls.airports, typeAirport).then(data => this.initSetup(data, flights_dataset))
   }
-
 
   initSetup(airports, flight_data) { // process airport and flight data
     this.airports = airports;
     this.updateMap(flight_data);
   }
 
-  updateMap(flights){
-    this.createLinks(flights);
-    this.drawAirports();
-    this.drawFlights(flights);
-    //this.drawPolygons();
-  }
+    updateMap(flight_data){
+        this.flights = flight_data[0];
+        this.totalFlights = flight_data[1];
+        this.maxFlightCount = flight_data[2];
+
+        this.strengths = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0, 25]);
+        this.links = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0,1]);
+
+        this.color = d3.scaleLinear()
+            .domain([0, this.maxFlightCount])
+            .range(['#08306b','#08519c','#2171b5','#4292c6','#6baed6','#9ecae1','#c6dbef','#deebf7','#f7fbff'])
+            .interpolate(d3.interpolateHcl);
+
+        this.createLinks(this.flights);
+        this.drawAirports();
+        this.drawFlights(this.flights);
+        //this.drawPolygons();
+    }
 
   drawMap(values) { // DRAW UNDERLYING MAP
     let map = values[0];
@@ -160,8 +168,13 @@ class DaVi {
        .append("path")
        .attr("d", line)
        .attr("class", "flight")
-       .attr("stroke-width", d => d[1].weight/700) //d => d.length/3
-       .attr("stroke", d => "rgba(20,20,"+d[1].weight+",1")//d => "rgba(0,0,180,"+(d.length/2)+")")
+       .attr("stroke-width", d => d[1].weight/this.maxFlightCount*2.0) //d => d.length/3
+       .attr("stroke", (d) => {
+           let color = this.color(d[1].weight);
+           let res = color.split("(");
+           let res2 = res[1].split(")");
+           return "rgba(" + res2[0] + ",1)";
+       })//d => "rgba(0,0,180,"+(d.length/2)+")")
        .each(function(d) {
          d[0].flights.push(this); // adds the path object to our source airport, makes it fast to select outgoing paths
        });
@@ -170,11 +183,11 @@ class DaVi {
        .alphaDecay(0.6) // settle at a layout faster
    
        .force("charge", d3.forceManyBody() // nearby nodes attract each other
-         .strength(d => DaVi.scales.strengths(d.outgoing))
+         .strength(d => this.strengths(d.outgoing))
          .distanceMax(1000)
        )
        .force("link", d3.forceLink() // edges want to be as short as possible, prevents too much stretching
-         .strength(d => DaVi.scales.links(d.weight))
+         .strength(d => this.links(d.weight))
          .distance(0)
        )
        .on("tick", function(d) {
@@ -287,7 +300,7 @@ class DaVi {
       // calculate total number of inner nodes for this link
       let total = Math.round(DaVi.scales.segments(length));
  
-      let weight = parseInt(d.FLIGHTCOUNT);
+      let weight = +d.FLIGHTCOUNT;
       // create scales from source to target
       let xscale = d3.scaleLinear()
         .domain([0, total + 1]) // source, inner nodes, target
