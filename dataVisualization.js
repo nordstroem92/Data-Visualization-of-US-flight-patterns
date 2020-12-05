@@ -27,7 +27,7 @@ class DaVi {
       voronoi:  this.svg.select(".voronoi")
     };
 
-    d3.json(DaVi.urls.map).then(data => this.drawMap(data, this.g.basemap));
+    d3.json(DaVi.urls.map).then(data => this.drawMap(data));
     d3.csv(DaVi.urls.airports, typeAirport).then(data => this.initSetup(data, this.flights)) 
   }
 
@@ -46,13 +46,15 @@ class DaVi {
   drawMap(map) { // DRAW UNDERLYING MAP
     map.objects.states.geometries = map.objects.states.geometries.filter(isContinental);
     let land = topojson.merge(map, map.objects.states.geometries); // run topojson on remaining states and adjust projection
+    console.log(map.objects.states.geometries[0].properties.name);
   
     let path = d3.geoPath(); // use null projection; data is already projected
   
     this.g.basemap.append("path") // draw base map
       .datum(land)
       .attr("class", "land")
-      .attr("d", path);
+      .attr("d", path)
+      .attr("fill", "#DDDDDD");
   
     this.g.basemap.append("path") // draw interior borders
       .datum(topojson.mesh(map, map.objects.states, (a, b) => a !== b))
@@ -64,7 +66,7 @@ class DaVi {
       .attr("class", "border exterior")
       .attr("d", path);
   }
-  
+
   drawAirports() {
     this.g.airports.selectAll("circle.airport").remove(); 
     this.g.airports.selectAll("circle.airport") // draw airport bubbles
@@ -315,7 +317,6 @@ class DaVi {
       });
       bundle.paths.push(local);
     });
-    console.log(bundle.paths);
     return bundle;
   }
 }

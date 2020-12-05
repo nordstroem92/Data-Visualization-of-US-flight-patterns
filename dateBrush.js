@@ -29,6 +29,7 @@ let y = d3.scaleLinear().range([height2, 0]);
 let valueline = d3.line()
     .x(function(d) {return x(d.DATE);})
     .y(function(d) {return y(+d.FLIGHTCOUNT);});
+    console.log(valueline)
 
 let brush = d3.brushX()
     .extent([[0, 0], [width2, height2]])
@@ -98,7 +99,7 @@ function updateViews(){
     let update = new Promise(resolve => {
         resolve(dataset_1.refresh().then(data => visualization1 = new DaVi("#svg_flights_2018", data)));
         resolve(dataset_2.refresh().then(data => visualization2 = new DaVi("#svg_flights_2019", data)));
-        resove(dataset_3.refresh().then(data => visualization3 = new DaVi("#svg_flights_2020", data)));
+        resolve(dataset_3.refresh().then(data => visualization3 = new DaVi("#svg_flights_2020", data)));
     });
 
     update.then(() => {
