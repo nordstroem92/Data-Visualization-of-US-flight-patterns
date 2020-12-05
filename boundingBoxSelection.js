@@ -78,6 +78,15 @@ function setClass(nodes, className, enable){
     }
 }
 
+function updateSelectedClasses() {
+    let airportsArray = Array.from(selectedAirports);
+    for(let i=0; i<airportsArray.length; i++){
+        let ident = airportsArray[i];
+        let circleSelections = d3.selectAll("."+ident).nodes();
+        setClass(circleSelections, "selected", true);
+    }
+}
+
 function getAirportsInSelection(){
     let inBox = [];
     let selection = getSelectionBox();

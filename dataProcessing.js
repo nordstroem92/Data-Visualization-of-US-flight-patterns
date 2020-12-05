@@ -252,9 +252,9 @@ class DataSet {
         });
     }
 
-    readSum(){
+    static readSum(year){
         let startTime = (new Date()).getTime();
-        return d3.csv("Data/sum_flights_" + this.year + ".csv").then((data) => {
+        return d3.csv("Data/sum_flights_" + year + ".csv").then((data) => {
             for (let i = 0; i < data.length; i++) {
                 data[i].DATE = new Date(+data[i].DATE);
             }
@@ -264,10 +264,14 @@ class DataSet {
 
 
 
+
+
 }
 
 
 // HELPER FUNCTIONS
+
+
 
 function intersect(filter1, filter2) {
     return filter1.then(function (data1) {
