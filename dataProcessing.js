@@ -80,6 +80,8 @@ class DataSet {
 
         this.aggregated = this.rawData.then(function (data) {
             let aggregatedData = []
+            let totalFlights = 0;
+            let maxFlightCount = 0;
             for (let i = 0; i < data.length; i++) {
                 let flight = data[i];
 
@@ -95,15 +97,22 @@ class DataSet {
                 }
                 if(!(dateFilter && dayOfWeekFilter && geoFilter())) continue;
 
+                totalFlights += +flight.FLIGHTCOUNT;
+                let flightVal = +flight.FLIGHTCOUNT;
+
                 let flightIndex = listContainsFlight(aggregatedData, flight);
-                if (flightIndex !== -1) aggregatedData[flightIndex].FLIGHTCOUNT += +flight.FLIGHTCOUNT;
+                if (flightIndex !== -1) {
+                    aggregatedData[flightIndex].FLIGHTCOUNT += +flight.FLIGHTCOUNT;
+                    flightVal = aggregatedData[flightIndex].FLIGHTCOUNT;
+                }
                 else aggregatedData.push({
                     "ORIGIN": flight.ORIGIN,
                     "DESTINATION": flight.DESTINATION,
                     "FLIGHTCOUNT": +flight.FLIGHTCOUNT
                 });
+                if(flightVal > maxFlightCount) maxFlightCount = +flightVal;
             }
-            return aggregatedData;
+            return [aggregatedData, totalFlights, maxFlightCount];
         });
         return this.aggregated;
     }
