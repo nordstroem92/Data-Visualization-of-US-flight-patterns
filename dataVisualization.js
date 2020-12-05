@@ -139,8 +139,8 @@ class DaVi {
        .append("path")
        .attr("d", line)
        .attr("class", "flight")
-       .attr("stroke-width", "1.5px") //d => d.length/3
-       .attr("stroke","rgba(20,20,180,0.95")//d => "rgba(0,0,180,"+(d.length/2)+")")
+       .attr("stroke-width", d => d[1].weight/700) //d => d.length/3
+       .attr("stroke", d => "rgba(20,20,"+d[1].weight+",1")//d => "rgba(0,0,180,"+(d.length/2)+")")
        .each(function(d) {
          d[0].flights.push(this); // adds the path object to our source airport, makes it fast to select outgoing paths
        });
@@ -251,7 +251,7 @@ class DaVi {
     // links: all individual segments (source to target)
     // paths: all segments combined into single path for drawing
     let bundle = {nodes: [], links: [], paths: []};
-  
+
     // make existing nodes fixed
     bundle.nodes = nodes.map(function(d, i) {
       d.fx = d.x;
@@ -265,9 +265,8 @@ class DaVi {
   
       // calculate total number of inner nodes for this link
       let total = Math.round(DaVi.scales.segments(length));
-      
-      let weight = d.FLIGHTCOUNT; 
-
+ 
+      let weight = parseInt(d.FLIGHTCOUNT);
       // create scales from source to target
       let xscale = d3.scaleLinear()
         .domain([0, total + 1]) // source, inner nodes, target
@@ -283,15 +282,18 @@ class DaVi {
   
       // add all points to local path
       let local = [source];
-  
+
       for (let j = 1; j <= total; j++) {
         // calculate target node
         target = {
           x: xscale(j),
-          y: yscale(j)
+          y: yscale(j),
+          weight: weight
         };
-  
+    
         local.push(target);
+        local.push(target);
+
         bundle.nodes.push(target);
   
         bundle.links.push({
@@ -302,6 +304,7 @@ class DaVi {
   
         source = target;
       }
+
       local.push(d.target);
       
       // add last link to target node
@@ -310,9 +313,9 @@ class DaVi {
         target: d.target,
         weight: weight
       });
-  
       bundle.paths.push(local);
     });
+    console.log(bundle.paths);
     return bundle;
   }
 }

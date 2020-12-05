@@ -30,7 +30,7 @@ body {
 .flight {
   fill: none;
   /*stroke: #252525;*/
-  stroke-opacity: 0.1;
+  stroke-opacity: 0.15;
 }
 
 .voronoi {
