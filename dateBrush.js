@@ -1,14 +1,5 @@
-DataSet.setDaysOfWeek([1, 2, 3, 4, 5, 6, 0]) // all days
-DataSet.setDateRange({"startDate": new Date("2018-03-30"), "endDate": new Date("2018-08-31")});
-DataSet.setGeoAreaFilter({"geoArea": ["DEN", "ORD", "ATL"], "checkOrigin": false, "checkDestination": true});
-
-let dataSet = new DataSet("Data/flights_2020.csv");
-
-let processedData = dataSet.refresh().then(() => {
-    return new Promise(resolve => {
-        resolve(dataSet.readSum())
-    })
-
+let processedData = new Promise(resolve => {
+    resolve(DataSet.readSum(2020));
 });
 
 let lastSelection = null;
