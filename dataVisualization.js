@@ -2,6 +2,7 @@ class DaVi {
   static urls = {
     map: "https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json", // source: https://github.com/topojson/us-atlas
     airports: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/airport_locations.csv", // source: https://gist.github.com/mbostock/7608400
+    covid: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/covid_by_state_jan-aug%20.csv"
   };
   static width  = 960;
   static height = 600;
@@ -27,9 +28,15 @@ class DaVi {
       voronoi:  this.svg.select(".voronoi")
     };
 
-    d3.json(DaVi.urls.map).then(data => this.drawMap(data));
+    this.promises = [   
+      d3.json(DaVi.urls.map),
+      d3.csv(DaVi.urls.covid)
+    ]
+    Promise.all(this.promises).then(data => this.drawMap(data));
+
     d3.csv(DaVi.urls.airports, typeAirport).then(data => this.initSetup(data, this.flights)) 
   }
+
 
   initSetup(airports, flight_data) { // process airport and flight data
     this.airports = airports;
@@ -43,11 +50,14 @@ class DaVi {
     //this.drawPolygons();
   }
 
-  drawMap(map) { // DRAW UNDERLYING MAP
+  drawMap(values) { // DRAW UNDERLYING MAP
+    let map = values[0];
+    let covid = values[1];
+    map.objects.states.geometries.forEach(d => console.log(d.properties));
+
     map.objects.states.geometries = map.objects.states.geometries.filter(isContinental);
     let land = topojson.merge(map, map.objects.states.geometries); // run topojson on remaining states and adjust projection
-    
-  
+
     let path = d3.geoPath(); // use null projection; data is already projected
   
     this.g.basemap.append("path") // draw base map
