@@ -96,9 +96,9 @@ function updateViews(){
     DataSet.setGeoAreaFilter(geoSettings);
 
     let update = new Promise(resolve => {
-        resolve(dataset_1.refresh().then(data => visualization1 = new DaVi("#svg_flights_2018", data)));
-        resolve(dataset_2.refresh().then(data => visualization2 = new DaVi("#svg_flights_2019", data)));
-        resove(dataset_3.refresh().then(data => visualization3 = new DaVi("#svg_flights_2020", data)));
+        resolve(dataset_1.refresh().then(data => visualization1.updateMap(data)));
+        resolve(dataset_2.refresh().then(data => visualization2.updateMap(data)));
+        resolve(dataset_3.refresh().then(data => visualization3.updateMap(data)));
     });
 
     update.then(() => {

@@ -88,9 +88,10 @@ class DataSet {
                 let dateFilter = flight.DATE >= startDate && flight.DATE <= endDate;
                 let dayOfWeekFilter = days.includes(flight.DATE.getDay())
                 let geoFilter = () => {
-                    if (checkOrigin && checkDestination) return (geoArea.includes(flight.ORIGIN) && geoArea.includes(flight.DESINTAION));
+                    if (checkOrigin && checkDestination) return (geoArea.includes(flight.ORIGIN) && geoArea.includes(flight.DESTINATION));
                     if (checkOrigin) return geoArea.includes(flight.ORIGIN);
-                    return geoArea.includes(flight.DESTINATION);
+                    if (checkDestination) return geoArea.includes(flight.DESTINATION);
+                    return true;
                 }
                 if(!(dateFilter && dayOfWeekFilter && geoFilter())) continue;
 

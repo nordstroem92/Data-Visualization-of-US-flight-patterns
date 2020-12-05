@@ -37,6 +37,7 @@ class DaVi {
   }
 
   updateMap(flights){
+      console.log(flights);
     this.createLinks(flights);
     this.drawAirports();
     this.drawFlights(flights);
