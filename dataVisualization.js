@@ -1,8 +1,8 @@
 class DaVi {
   static urls = {
-    map: "https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json", // source: https://github.com/topojson/us-atlas
+    map: "https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json",//"https://d3js.org/us-10m.v1.json",//"https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json", // source: https://github.com/topojson/us-atlas
     airports: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/airport_locations.csv", // source: https://gist.github.com/mbostock/7608400
-    covid: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/covid_by_state_jan-aug.csv"
+    covid: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv"
   };
   static width  = 960;
   static height = 600;
@@ -61,27 +61,50 @@ class DaVi {
   drawMap(values) { // DRAW UNDERLYING MAP
     let map = values[0];
     let covid = values[1];
+    
     map.objects.states.geometries.forEach(obj => {
-      console.log(obj.properties);
+      obj.deaths = 0;
       covid.forEach(index => {
         if(obj.properties.name == index.state){
-          obj.deaths = index.conf_death;
+          obj.deaths += parseInt(index.new_death);
         }
       });
-      console.log(obj.properties.name + ": "+obj.deaths);
+
+      console.log(obj.deaths);
     });
+  
+  
       
     map.objects.states.geometries = map.objects.states.geometries.filter(isContinental);
     let land = topojson.merge(map, map.objects.states.geometries); // run topojson on remaining states and adjust projection
-
+    console.log(topojson.merge(map, map.objects.states.geometries)); 
     let path = d3.geoPath(); // use null projection; data is already projected
+
+    this.g.basemap.append("g")
+    .attr("class", "land")
+    .selectAll("path")
+    .data(topojson.feature(map, map.objects.states).features)
+    .enter().append("path")
+    .attr("fill", d => {
+      let color; 
+      map.objects.states.geometries.forEach(m => {
+        if(d.id == m.id) {
+          color = m.deaths;
+          console.log(m.deaths)
+        }
+      })
+      return "rgba(1,1,"+color+",1)"; 
+    })
+    .attr("d", path)
+    .append("title")
+    .text(d => d.rate + "%");
   
-    this.g.basemap.append("path") // draw base map
+   this.g.basemap.append("path") // draw base map
       .datum(land)
       .attr("class", "land")
       .attr("d", path)
-      .attr("fill", "#DDDDDD");
-  
+      .attr("fill", "none");
+      
     this.g.basemap.append("path") // draw interior borders
       .datum(topojson.mesh(map, map.objects.states, (a, b) => a !== b))
       .attr("class", "border interior")
