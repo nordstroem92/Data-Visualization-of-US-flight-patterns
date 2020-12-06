@@ -3,8 +3,9 @@ let buttonHeld = false;
 let MINIMUM_BOUNDING_BOX_SIZE = 2;
 let selectedAirports = new Set();
 let bboxSelection = [];
-
+let isCtrlHeld = false;
 //setupOnClick();
+
 
 function reCalc() {
     let x3 = Math.min(x1,x2); //Smaller X
@@ -19,7 +20,9 @@ function reCalc() {
 }
 
 onmousedown = function(e) {
+    isCtrlHeld = e.ctrlKey;
     buttonHeld = true;
+    if(isCtrlHeld) d3.select(div).classed("deselectionBox", true);
     x1 = e.pageX; //Set the initial X
     y1 = e.pageY; //Set the initial Y
     reCalc();
@@ -46,29 +49,39 @@ onmousemove = function(e) {
     x2 = e.pageX;
     y2 = e.pageY;
     let size = reCalc();
-    if(!buttonHeld || !size[0] >=MINIMUM_BOUNDING_BOX_SIZE || !size[1] >= MINIMUM_BOUNDING_BOX_SIZE) return ;
+    if(!buttonHeld || !size[0] >=MINIMUM_BOUNDING_BOX_SIZE || !size[1] >= MINIMUM_BOUNDING_BOX_SIZE) return;
 
     div.hidden = 0;
     bboxSelection = getAirportsInSelection();
     for(let i=0; i<bboxSelection.length; i++) {
         let ident = bboxSelection[i];
         let circleSelections = d3.selectAll("."+ident).nodes();
-        setClass(circleSelections, "temp-selection", true);
+        if(!isCtrlHeld) setClass(circleSelections, "temp-selection", true);
+        else markDeselectionBox(circleSelections);
     }
-
 };
+
+function markDeselectionBox(circleSelections){
+    let isSelected = d3.select(circleSelections[0]).classed("selected");
+    if(!isSelected) return;
+    setClass(circleSelections, "temp-deselection", true);
+}
 
 onmouseup = function(e) {
     buttonHeld = false;
     div.hidden = 1;
     for(let i=0; i<bboxSelection.length; i++){
         let ident = bboxSelection[i];
-        selectedAirports.add(ident);
+        if(!isCtrlHeld) selectedAirports.add(ident);
+        else selectedAirports.delete(ident);
         let circleSelections = d3.selectAll("."+ident).nodes();
-        setClass(circleSelections, "selected", true);
+        setClass(circleSelections, "selected", !isCtrlHeld);
     }
     bboxSelection = [];
     setClass(d3.selectAll("circle.airport").nodes(), "temp-selection", false);
+    setClass(d3.selectAll("circle.airport").nodes(), "temp-deselection", false);
+    isCtrlHeld = false;
+    d3.select(div).classed("deselectionBox", false);
 };
 
 function setClass(nodes, className, enable){

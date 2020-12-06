@@ -14,7 +14,7 @@ class DaVi {
   };
   static tooltip = d3.select("text#tooltip");
 
-  constructor(svg_id, flights_dataset){
+  constructor(svg_id, dataset){
     this.svg  = d3.select(svg_id);
     this.airports;
 
@@ -31,7 +31,7 @@ class DaVi {
     ]
     Promise.all(this.promises).then(data => this.drawMap(data));
 
-    d3.csv(DaVi.urls.airports, typeAirport).then(data => this.initSetup(data, flights_dataset))
+    d3.csv(DaVi.urls.airports, typeAirport).then(data => this.initSetup(data, dataset))
   }
 
   initSetup(airports, flight_data) { // process airport and flight data
@@ -39,10 +39,12 @@ class DaVi {
     this.updateMap(flight_data);
   }
 
-    updateMap(flight_data){
-        this.flights = flight_data[0];
-        this.totalFlights = flight_data[1];
-        this.maxFlightCount = flight_data[2];
+    updateMap(dataset){
+        this.flights_dataset = dataset[0];
+        this.corona_dataset = dataset[1];
+        this.flights = this.flights_dataset[0];
+        this.totalFlights = this.flights_dataset[1];
+        this.maxFlightCount = this.flights_dataset[2];
 
         this.strengths = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0, 25]);
         this.links = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0,1]);
@@ -63,14 +65,13 @@ class DaVi {
     let covid = values[1];
     
     map.objects.states.geometries.forEach(obj => {
-      obj.deaths = 0;
+      //console.log(obj.properties);
       covid.forEach(index => {
         if(obj.properties.name == index.state){
           obj.deaths += parseInt(index.new_death);
         }
       });
-
-      console.log(obj.deaths);
+      //console.log(obj.properties.name + ": "+obj.deaths);
     });
   
   
