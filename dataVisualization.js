@@ -61,16 +61,15 @@ class DaVi {
   drawMap(values) { // DRAW UNDERLYING MAP
     let map = values[0];
     let covid = values[1];
-    /*map.objects.states.geometries.forEach(obj => {
-      let deaths = 0;
+    map.objects.states.geometries.forEach(obj => {
+      console.log(obj.properties);
       covid.forEach(index => {
-        if (obj.properties.name == index.state) {
-          deaths += parseInt(index.conf_death);
+        if(obj.properties.name == index.state){
+          obj.deaths = index.conf_death;
         }
       });
-      obj.deaths = deaths;
-      console.log(obj);
-    });*/
+      console.log(obj.properties.name + ": "+obj.deaths);
+    });
       
     map.objects.states.geometries = map.objects.states.geometries.filter(isContinental);
     let land = topojson.merge(map, map.objects.states.geometries); // run topojson on remaining states and adjust projection
