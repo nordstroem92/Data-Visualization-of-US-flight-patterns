@@ -21,7 +21,7 @@ class DataSet {
                 });
             }).then(flightData => {
                 return new Promise((resolve, reject) => {
-                    if(coronaFileName === null) resolve([flightData, []]);
+                    if (coronaFileName === null) resolve([flightData, []]);
                     else d3.csv(coronaFileName)
                         .then(data => {
                             for (let i = 0; i < data.length; i++) {
@@ -76,18 +76,17 @@ class DataSet {
                     return true;
                 }
 
-                if(coronaDateFilter && coronaDayOfWeekFilter){
+                if (coronaDateFilter && coronaDayOfWeekFilter) {
                     let coronaIndex = listContainsState(coronaAggregatedData, corona);
                     if (coronaIndex !== -1) {
                         coronaAggregatedData[coronaIndex].DEATHS += +corona.NEW_DEATHS;
-                    }
-                    else coronaAggregatedData.push({
+                    } else coronaAggregatedData.push({
                         "STATE": corona.STATE,
                         "DEATHS": +corona.NEW_DEATHS
                     });
                 }
 
-                if(!(dateFilter && dayOfWeekFilter && geoFilter())) continue;
+                if (!(dateFilter && dayOfWeekFilter && geoFilter())) continue;
 
                 totalFlights += +flight.FLIGHTCOUNT;
                 let flightVal = +flight.FLIGHTCOUNT;
@@ -96,16 +95,15 @@ class DataSet {
                 if (flightIndex !== -1) {
                     aggregatedData[flightIndex].FLIGHTCOUNT += +flight.FLIGHTCOUNT;
                     flightVal = aggregatedData[flightIndex].FLIGHTCOUNT;
-                }
-                else aggregatedData.push({
+                } else aggregatedData.push({
                     "ORIGIN": flight.ORIGIN,
                     "DESTINATION": flight.DESTINATION,
                     "FLIGHTCOUNT": +flight.FLIGHTCOUNT
                 });
-                if(flightVal > maxFlightCount) maxFlightCount = +flightVal;
+                if (flightVal > maxFlightCount) maxFlightCount = +flightVal;
             }
 
-            for(let i = 0; i < coronaData.length; i++){
+            for (let i = 0; i < coronaData.length; i++) {
 
             }
 
@@ -142,7 +140,7 @@ class DataSet {
             });
     }
 
-    static readSum(year){
+    static readSum(year) {
         //return d3.csv("Data/sum_flights_" + year + ".csv").then((data) => {
         return d3.csv("https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/sum_flights_" + year + ".csv").then((data) => { //Jeg får stadig CORS errors med lokale filer :-(
             for (let i = 0; i < data.length; i++) {

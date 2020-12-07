@@ -14,6 +14,8 @@ class DaVi {
   };
   static path = d3.geoPath();  //d3.geoPath()
 
+    static updating = 0;
+
   constructor(svg_id, dataset){
     this.svg  = d3.select(svg_id);
     this.airports;
@@ -27,7 +29,7 @@ class DaVi {
     this.tooltip = this.svg.select(".tooltip");
 
     this.promises = [
-      d3.json(DaVi.urls.map), 
+      d3.json(DaVi.urls.map),
       d3.csv(DaVi.urls.airports, typeAirport),
       d3.csv(DaVi.urls.population_data)
     ]
@@ -48,7 +50,7 @@ class DaVi {
       this.totalFlights = this.flights_dataset[1];
       this.maxFlightCount = this.flights_dataset[2];
 
-      this.strengths = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0, 25]);
+      this.strengths = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0, 25/2]);
       this.links = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0,1]);
 
       this.color = d3.scaleLinear()
@@ -75,21 +77,21 @@ class DaVi {
 
     if(covid.length) { //only draw choropleth map if it has covid data
       this.drawChroropleth(map, covid, population_data);
-    } else { 
-      basemap_fill = "#F5F5F5"; 
+    } else {
+      basemap_fill = "#F5F5F5";
     }
-  
+
     this.g.basemap.append("path") // draw base map
       .datum(land)
       .attr("class", "land")
       .attr("d", DaVi.path)
       .attr("fill", basemap_fill);
-      
+
     this.g.basemap.append("path") // draw interior borders
       .datum(topojson.mesh(map, map.objects.states, (a, b) => a !== b))
       .attr("class", "border interior")
       .attr("d", DaVi.path);
-  
+
     this.g.basemap.append("path") // draw exterior borders
       .datum(topojson.mesh(map, map.objects.states, (a, b) => a === b))
       .attr("class", "border exterior")
@@ -116,7 +118,7 @@ class DaVi {
     .selectAll("path")
     .data(topojson.feature(map, map.objects.states).features)
     .enter().append("path")
-    .attr("fill", feature => {      
+    .attr("fill", feature => {
       let fill = "rgba(150,150,150,1)";
       map.objects.states.geometries.forEach(obj => {
         if (feature.id == obj.id){
@@ -132,7 +134,7 @@ class DaVi {
 
   drawAirports() {
     let tooltip = this.tooltip;
-    this.g.airports.selectAll("circle.airport").remove(); 
+    this.g.airports.selectAll("circle.airport").remove();
     this.g.airports.selectAll("circle.airport") // draw airport bubbles
       .data(this.airports, d => d.ident)
       .enter()
@@ -191,7 +193,7 @@ class DaVi {
   }
 
   drawFlights(flights) {
-     this.g.flights.selectAll("path.flight").remove(); 
+     this.g.flights.selectAll("path.flight").remove();
      let bundle = this.generateSegments(this.airports, flights); // break each flight between airports into multiple segments
 
      let line = d3.line() // https://github.com/d3/d3-shape#curveBundle
@@ -215,10 +217,10 @@ class DaVi {
        .each(function(d) {
          d[0].flights.push(this); // adds the path object to our source airport, makes it fast to select outgoing paths
        });
-   
+
      let layout = d3.forceSimulation() // https://github.com/d3/d3-force
        .alphaDecay(0.6) // settle at a layout faster
-   
+
        .force("charge", d3.forceManyBody() // nearby nodes attract each other
          .strength(d => this.strengths(d.outgoing))
          .distanceMax(1000)
@@ -231,10 +233,14 @@ class DaVi {
          links.attr("d", line);
        })
        .on("end", function(d) {
-         document.getElementById("loader").style.display = "none";
+           DaVi.updating += 1;
+           if(DaVi.updating >= 3) {
+               DaVi.updating = 0;
+               document.getElementById("loader").style.display = "none";
+           }
          console.log("layout complete");
        });
-   
+
      layout.nodes(bundle.nodes).force("link").links(bundle.links);
    }
 
@@ -246,7 +252,7 @@ class DaVi {
         link.source = ident.get(link.ORIGIN);
         link.target = ident.get(link.DESTINATION);
         link.source.outgoing += parseInt(link.FLIGHTCOUNT);
-    }); 
+    });
    }
 
    drawPolygons() {
@@ -262,7 +268,7 @@ class DaVi {
         }
       };
     });
-  
+
     // calculate voronoi polygons
     const polygons = d3.geoVoronoi().polygons(geojson);
     this.g.voronoi.selectAll("path")
@@ -273,48 +279,48 @@ class DaVi {
       .attr("class", "voronoi")
       .on("mouseover", function(d) {
         let airport = d.properties.site.properties;
-  
+
         d3.select(airport.bubble)
           .classed("highlight", true);
-  
+
         d3.selectAll(airport.flights)
           .classed("highlight", true)
           .raise();
-  
+
         // make tooltip take up space but keep it invisible
         tooltip.style("display", null);
         tooltip.style("visibility", "hidden");
-  
+
         // set default tooltip positioning
         tooltip.attr("text-anchor", "middle");
         tooltip.attr("dy", -15);
         tooltip.attr("x", airport.x);
         tooltip.attr("y", airport.y);
-  
+
         // set the tooltip text
         tooltip.text(airport.name);
-  
+
         // double check if the anchor needs to be changed
         let bbox = tooltip.node().getBBox();
-  
+
         if (bbox.x <= 0) {
           tooltip.attr("text-anchor", "start");
         }
         else if (bbox.x + bbox.width >= DaVi.width) {
           tooltip.attr("text-anchor", "end");
         }
-  
+
           tooltip.style("visibility", "visible");
       })
       .on("mouseout", function(d) {
         let airport = d.properties.site.properties;
-  
+
         d3.select(airport.bubble)
           .classed("highlight", false);
-  
+
         d3.selectAll(airport.flights)
           .classed("highlight", false);
-  
+
         tooltip.style("visibility", "hidden");
       })
   }
@@ -331,28 +337,28 @@ class DaVi {
       d.fy = d.y;
       return d;
     });
-  
+
     links.forEach(function(d) {
       // calculate the distance between the source and target
       let length = distance(d.source, d.target);
-  
+
       // calculate total number of inner nodes for this link
       let total = Math.round(DaVi.scales.segments(length));
- 
+
       let weight = +d.FLIGHTCOUNT;
       // create scales from source to target
       let xscale = d3.scaleLinear()
         .domain([0, total + 1]) // source, inner nodes, target
         .range([d.source.x, d.target.x]);
-  
+
       let yscale = d3.scaleLinear()
         .domain([0, total + 1])
         .range([d.source.y, d.target.y]);
-  
+
       // initialize source node
       let source = d.source;
       let target = null;
-  
+
       // add all points to local path
       let local = [source];
 
@@ -363,23 +369,23 @@ class DaVi {
           y: yscale(j),
           weight: weight
         };
-    
+
         local.push(target);
         local.push(target);
 
         bundle.nodes.push(target);
-  
+
         bundle.links.push({
           source: source,
           target: target,
           weight: weight
         });
-  
+
         source = target;
       }
 
       local.push(d.target);
-      
+
       // add last link to target node
       bundle.links.push({
         source: target,
@@ -415,7 +421,7 @@ function typeAirport(airport) { //see airports.csv, convert gps coordinates to n
 function typeMap(map) { //see airports.csv, convert gps coordinates to number and init degree
   map.transform.scale[0] = 0.00507599312;
   map.transform.scale[1] = 0.00296799503;
-  
+
   map.transform.translate[0] = -30; //needs to be hardcoded
   map.transform.translate[1] = 11.5; //needs to be hardcoded
 
