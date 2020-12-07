@@ -123,7 +123,6 @@ class DateBrush {
 
     updateDisplayDates = () => {
         let selection = d3.event.selection;
-        console.log(selection);
         if (selection != null){
             this.lastSelection = selection;
         }
@@ -146,10 +145,11 @@ class DateBrush {
 
 
     static brushesList = [];
-    static defaultSelectionObject = null;
+    static lastDictator = null;
 
     static moveBrushes(dictator) {
         let selectedDates = dictator.getSelectedDates();
+        this.lastDictator = dictator;
 
         for(let i=0; i<this.brushesList.length; i++){
             let brushObj = this.brushesList[i];
@@ -185,7 +185,7 @@ class DateBrush {
     }
 
     static updateViews(){
-        let dates = this.defaultSelectionobject.getSelectedDates();
+        let dates = this.lastDictator.getSelectedDates();
         let geoSettings = this.getGeoSettings();
         geoSettings["geoArea"] = getSelectedAirportCodes();
 

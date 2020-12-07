@@ -17,4 +17,4 @@ let dateBrush_1 = new DateBrush(2018, false);
 let dateBrush_2 = new DateBrush(2019, false);
 let dateBrush_3 = new DateBrush(2020, true);
 DateBrush.brushesList =  [dateBrush_1, dateBrush_2, dateBrush_3];
-DateBrush.defaultSelectionObject = dateBrush_3;
+DateBrush.lastDictator = dateBrush_3;
