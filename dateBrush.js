@@ -76,9 +76,14 @@ class DateBrush {
             let updateButton = d3.select("#updateButton")
                 .text("Update Data")
                 .on("click", () => {
+                    console.log("clicked update!");
                     document.getElementById("loader").style.display = "block";
-                    new Promise(resolve => 
-                        resolve(DateBrush.updateViews()))
+                    new Promise(resolve => {
+                        setTimeout(() => {
+                            console.log("starting")
+                            resolve(DateBrush.updateViews());
+                        }, 50);
+                    });
                 });
 
             if(!textEnabled) return;
@@ -189,6 +194,7 @@ class DateBrush {
     }
 
     static updateViews(){
+
         let dates = this.lastDictator.getSelectedDates();
         let geoSettings = this.getGeoSettings();
         geoSettings["geoArea"] = getSelectedAirportCodes();
