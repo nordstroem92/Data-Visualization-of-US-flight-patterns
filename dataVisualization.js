@@ -13,6 +13,7 @@ class DaVi {
     segments: d3.scaleLinear().domain([0, DaVi.hypotenuse]).range([1, 10]) // used to scale number of segments per line
   };
   static tooltip = d3.select("text#tooltip");
+  static path = d3.geoPath();  //d3.geoPath()
 
   constructor(svg_id, dataset){
     this.svg  = d3.select(svg_id);
@@ -25,48 +26,52 @@ class DaVi {
       voronoi:  this.svg.select(".voronoi")
     };
 
-    d3.json(DaVi.urls.map).then(d => this.drawMap(d, dataset[1])); // dataset[1] = covid
-    d3.csv(DaVi.urls.airports, typeAirport).then(data => this.initSetup(data, dataset))
+    this.promises = [
+      d3.json(DaVi.urls.map), 
+      d3.csv(DaVi.urls.airports, typeAirport)
+    ]
+    Promise.all(this.promises).then(setup_values => this.initSetup(setup_values, dataset));
   }
 
-  initSetup(airports, flight_data) { // process airport and flight data
-    this.airports = airports;
-    this.updateMap(flight_data);
+  initSetup(setup_values, dataset) { // process airport and flight data
+    this.map_data = typeMap(setup_values[0]);
+    this.airports = setup_values[1];
+    this.updateMap(dataset);
   }
 
-    updateMap(dataset){
-        this.flights_dataset = dataset[0];
-        this.corona_dataset = dataset[1];
-        this.flights = this.flights_dataset[0];
-        this.totalFlights = this.flights_dataset[1];
-        this.maxFlightCount = this.flights_dataset[2];
+  updateMap(dataset){
+      this.flights_dataset = dataset[0];
+      this.corona_dataset = dataset[1];
+      this.flights = this.flights_dataset[0];
+      this.totalFlights = this.flights_dataset[1];
+      this.maxFlightCount = this.flights_dataset[2];
 
-        this.strengths = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0, 25]);
-        this.links = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0,1]);
+      this.strengths = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0, 25]);
+      this.links = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0,1]);
 
-        this.color = d3.scaleLinear()
-            .domain([0, this.maxFlightCount])
-            .range(['#08306b','#08519c','#2171b5','#4292c6','#6baed6','#9ecae1','#c6dbef','#deebf7','#f7fbff'])
-            .interpolate(d3.interpolateHcl);
+      this.color = d3.scaleLinear()
+          .domain([0, this.maxFlightCount])
+          .range(['#08306b','#08519c','#2171b5','#4292c6','#6baed6','#9ecae1','#c6dbef','#deebf7','#f7fbff'])
+          .interpolate(d3.interpolateHcl);
 
-        this.createLinks(this.flights);
-        this.drawAirports();
-        this.drawFlights(this.flights);
-        //this.drawPolygons();
+      this.drawMap(this.corona_dataset);
+      this.createLinks(this.flights);
+      this.drawAirports();
+      this.drawFlights(this.flights);
+      //this.drawPolygons();
     }
 
-  drawMap(topo_data, covid_data) { // DRAW UNDERLYING MAP
-    let map = typeMap(topo_data);
+  drawMap(covid_data) { // DRAW UNDERLYING MAP
+    let map = this.map_data;
     let covid = covid_data;
 
     map.objects.states.geometries = map.objects.states.geometries.filter(isContinental);
     let land = topojson.merge(map, map.objects.states.geometries); // run topojson on remaining states and adjust projection
 
-    var path = d3.geoPath();  //d3.geoPath()
     let basemap_fill = "none";
 
     if(covid.length) { //only draw choropleth map if it has covid data
-      this.drawChroropleth(map, covid, path);
+      this.drawChroropleth(map, covid);
     } else { 
       basemap_fill = "#DDDDDD"; 
     }
@@ -74,21 +79,21 @@ class DaVi {
     this.g.basemap.append("path") // draw base map
       .datum(land)
       .attr("class", "land")
-      .attr("d", path)
+      .attr("d", DaVi.path)
       .attr("fill", basemap_fill);
       
     this.g.basemap.append("path") // draw interior borders
       .datum(topojson.mesh(map, map.objects.states, (a, b) => a !== b))
       .attr("class", "border interior")
-      .attr("d", path);
+      .attr("d", DaVi.path);
   
     this.g.basemap.append("path") // draw exterior borders
       .datum(topojson.mesh(map, map.objects.states, (a, b) => a === b))
       .attr("class", "border exterior")
-      .attr("d", path);
+      .attr("d", DaVi.path);
   }
 
-  drawChroropleth(map, covid, path){
+  drawChroropleth(map, covid){
     map.objects.states.geometries.forEach(obj => {
       obj.deaths = 0;
       covid.forEach(index => {
@@ -97,7 +102,6 @@ class DaVi {
         }
       })
     })
-
     this.g.basemap.append("g")
     .attr("class", "land")
     .selectAll("path")
@@ -112,7 +116,7 @@ class DaVi {
       })
       return fill;
     })
-    .attr("d", path)
+    .attr("d", DaVi.path)
     .append("title")
     .text(d => d.rate + "%");
   }
