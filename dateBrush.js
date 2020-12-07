@@ -15,10 +15,10 @@ class DateBrush {
 
 
         let margin = {top: 20, right: 20, bottom: 50, left: 70},
-            width2 = 960 - margin.left - margin.right,
+            width2 = 480 - margin.left - margin.right,
             height2 = 100 - margin.top - margin.bottom
 
-        let svg2 = d3.select("body").append("svg")
+        let svg2 = d3.select("#datebrush-container").append("svg")
             .attr("width", width2 + margin.left + margin.right)
             .attr("height", height2 + margin.top + margin.bottom)
             .append("g")

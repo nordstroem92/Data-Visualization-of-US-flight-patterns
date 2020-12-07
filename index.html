@@ -17,101 +17,70 @@
 
 <div id="loader"></div>
 <!-- must be 960x600 to match topojson us atlas files -->
-<svg id="svg_flights_2018" width="480" height="320">
-  <!-- must be in this order for drawing -->
-  <g class="basemap"></g>
-  <g class="flights"></g>
-  <g class="airports"></g>
-  <text class="tooltip" style="display: none;"></text>
-</svg>
+  <svg id="svg_flights_2018" width="480" height="320">
+    <text x="180" y="10" dy=".35em">Flights 2018</text>
+    <!-- must be in this order for drawing -->
+    <g class="basemap"></g>
+    <g class="flights"></g>
+    <g class="airports"></g>
+    <text class="tooltip" style="display: none;"></text>
+  </svg>
 
-<svg id="svg_flights_2019" width="480" height="320">
-  <!-- must be in this order for drawing -->
-  <g class="basemap"></g>
-  <g class="flights"></g>
-  <g class="airports"></g>
-  <text class="tooltip" style="display: none;"></text>
-</svg>
 
-<svg id="svg_flights_2020" width="480" height="320">
-  <!-- must be in this order for drawing -->
-  <g class="basemap"></g>
-  <g class="flights"></g>
-  <g class="airports"></g>
-  <text class="tooltip" style="display: none;"></text>
-</svg>
-<style> /* set the CSS */
+  <svg id="svg_flights_2019" width="480" height="320">
+    <text x="180" y="10" dy=".35em">Flights 2019</text>
+    <!-- must be in this order for drawing -->
+    <g class="basemap"></g>
+    <g class="flights"></g>
+    <g class="airports"></g>
+    <text class="tooltip" style="display: none;"></text>
+  </svg>
 
-.line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 2px;
-}
+  <svg id="svg_flights_2020" width="480" height="320">
+    <text x="180" y="10" dy=".35em">Flights 2020</text>
+    <!-- must be in this order for drawing -->
+    <g class="basemap"></g>
+    <g class="flights"></g>
+    <g class="airports"></g>
+    <text class="tooltip" style="display: none;"></text>
+  </svg>
+  <div id="datebrush-container"></div>
 
-.handle {
-  fill: black;
-  width: 3px;
-}
+<div class="all-panels-container">
+  <div class="noselect input-container geo-panel" id="geo_options">
+    <p><b>Geo options</b></p>
+    <input type="checkbox" id="checkOrigin" checked>
+    <label class="noselect" for="checkOrigin">Check Destination</label><br>
+    <input type="checkbox" id="checkDestination" checked>
+    <label class="noselect" for="checkDestination">Check Origin</label><br>
+  </div>
 
-.temp-selection {
-  fill: orange;
-}
-
-.selected {
-  fill: red;
-}
-
-.temp-deselection {
-  fill: orange !important;
-}
-
-#selectionBox {
-  border: 1px dotted #000;
-  position: absolute;
-}
-
-.deselectionBox {
-  border: 1px dotted red !important;
-}
-
-.noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Old versions of Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Edge, Opera and Firefox */
-}
-
-</style>
-
-<br>
-
-<button class="noselect" id="updateButton">Update Data</button>
-
-<div class="noselect" id="geo_options">
-  <input type="checkbox" id="checkOrigin" checked>
-  <label class="noselect" for="checkOrigin">Check Destination</label><br>
-  <input type="checkbox" id="checkDestination" checked>
-  <label class="noselect" for="checkDestination">Check Origin</label><br><br>
-</div>
-
-<div class="noselect" id="days_of_week">
-  <input type="checkbox" id="1" checked>
-  <label class="noselect" for="1">Monday</label><br>
-  <input type="checkbox" id="2" checked>
-  <label class="noselect" for="2">Tuesday</label><br>
-  <input type="checkbox" id="3" checked>
-  <label class="noselect" for="3">Wednesday</label><br>
-  <input type="checkbox" id="4" checked>
-  <label class="noselect" for="4">Thursday</label><br>
-  <input type="checkbox" id="5" checked>
-  <label class="noselect" for="5">Friday</label><br>
-  <input type="checkbox" id="6" checked>
-  <label class="noselect" for="6">Saturday</label><br>
-  <input type="checkbox" id="0" checked>
-  <label class="noselect" for="0">Sunday</label><br><br>
+  <div class="noselect input-container week-panel" id="days_of_week">
+    <p><b>Days of Week</b></p>
+    <div>
+      <input type="checkbox" id="1" checked>
+      <label class="noselect" for="1">Monday</label><br>
+      <input type="checkbox" id="2" checked>
+      <label class="noselect" for="2">Tuesday</label><br>
+      <input type="checkbox" id="3" checked>
+      <label class="noselect" for="3">Wednesday</label><br>
+      <input type="checkbox" id="4" checked>
+      <label class="noselect" for="4">Thursday</label><br>
+    </div>
+    <div> 
+      <input type="checkbox" id="5" checked>
+      <label class="noselect" for="5">Friday</label><br>
+      <input type="checkbox" id="6" checked>
+      <label class="noselect" for="6">Saturday</label><br>
+      <input type="checkbox" id="0" checked>
+      <label class="noselect" for="0">Sunday</label><br>
+    </div>
+    <div>
+    </div>
+  </div>
+  <div class="btn-div">
+    <button class="noselect" id="updateButton">Update Data</button>
+  </div>
 </div>
 
 <div id="selectionBox" hidden></div>

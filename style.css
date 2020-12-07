@@ -50,6 +50,92 @@ g.voronoi {
   pointer-events: all;
 }
 
+.datebrush-container{
+  width: 100%;
+  display: block;
+}
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+.handle {
+  fill: black;
+  width: 3px;
+}
+
+.temp-selection {
+  fill: orange;
+}
+
+.selected {
+  fill: red;
+}
+
+.temp-deselection {
+  fill: orange !important;
+}
+
+#selectionBox {
+  border: 1px dotted #000;
+  position: absolute;
+}
+
+.deselectionBox {
+  border: 1px dotted red !important;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+.input-container{
+  text-align: left;
+  height: 50px;
+  float: left;
+}
+.geo-panel{
+  width:250px;
+  height: 100px;
+}
+.week-panel {
+  width: 350px;
+  height: 100px;
+}
+.week-panel > div {
+  width: 50%;
+  float: left;
+}
+input[type=checkbox] {
+  display: inline-block;
+}
+button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  border: 2px solid #4CAF50;
+  border-radius: 4px;
+  color: white;
+  margin-top: 50px;
+}
+button:hover {
+  background-color: white;
+  color: black;
+}
+.btn-div {
+  float: left;
+}
+.all-panels-container {
+  margin: 0 300px;
+}
+
+text {
+  font-weight: bold;
+}
 /* shadow trick from bl.ocks.org */
 .tooltip {
   font-size: 10pt;
@@ -61,7 +147,7 @@ g.voronoi {
 #loader { /*loading screen*/
   border: 16px solid #b5b5b5;
   border-radius: 50%;
-  border-top: 16px solid #3dffbb;
+  border-top: 16px solid #4CAF50;;
   position: fixed;
   left: 50%;
   top: 50%;
