@@ -4,10 +4,10 @@ class DaVi {
     airports: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/airport_locations.csv", // source: https://gist.github.com/mbostock/7608400
     covid: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv"
   };
-  static width  = 960;
-  static height = 600;
+  static width  = 480;//960;
+  static height = 300//600;
   static hypotenuse = Math.sqrt(DaVi.width * DaVi.width + DaVi.height * DaVi.height);
-  static projection = d3.geoAlbers().scale(1280).translate([480, 300]); // must be hard-coded to match our topojson projection, source: https://github.com/topojson/us-atlas
+  static projection = d3.geoAlbers().scale(640).translate([240, 150]); // 480x300 must be hard-coded to match our topojson projection, source: https://github.com/topojson/us-atlas
   static scales = {
     airports: d3.scaleSqrt().range([4, 18]), // used to scale airport bubbles
     segments: d3.scaleLinear().domain([0, DaVi.hypotenuse]).range([1, 10]) // used to scale number of segments per line
@@ -25,12 +25,7 @@ class DaVi {
       voronoi:  this.svg.select(".voronoi")
     };
 
-    this.promises = [
-      d3.json(DaVi.urls.map),
-      d3.csv(DaVi.urls.covid)
-    ]
-    Promise.all(this.promises).then(data => this.drawMap(data));
-
+    d3.json(DaVi.urls.map).then(d => this.drawMap(d, dataset[1])); // dataset[1] = covid
     d3.csv(DaVi.urls.airports, typeAirport).then(data => this.initSetup(data, dataset))
   }
 
@@ -60,51 +55,27 @@ class DaVi {
         //this.drawPolygons();
     }
 
-  drawMap(values) { // DRAW UNDERLYING MAP
-    let map = values[0];
-    let covid = values[1];
-    
-    map.objects.states.geometries.forEach(obj => {
-      //console.log(obj.properties);
-      covid.forEach(index => {
-        if(obj.properties.name == index.state){
-          obj.deaths += parseInt(index.new_death);
-        }
-      });
-      //console.log(obj.properties.name + ": "+obj.deaths);
-    });
-  
-  
-      
+  drawMap(topo_data, covid_data) { // DRAW UNDERLYING MAP
+    let map = typeMap(topo_data);
+    let covid = covid_data;
+
     map.objects.states.geometries = map.objects.states.geometries.filter(isContinental);
     let land = topojson.merge(map, map.objects.states.geometries); // run topojson on remaining states and adjust projection
-    console.log(topojson.merge(map, map.objects.states.geometries)); 
-    let path = d3.geoPath(); // use null projection; data is already projected
 
-    this.g.basemap.append("g")
-    .attr("class", "land")
-    .selectAll("path")
-    .data(topojson.feature(map, map.objects.states).features)
-    .enter().append("path")
-    .attr("fill", d => {
-      let color; 
-      map.objects.states.geometries.forEach(m => {
-        if(d.id == m.id) {
-          color = m.deaths;
-          console.log(m.deaths)
-        }
-      })
-      return "rgba(1,1,"+color+",1)"; 
-    })
-    .attr("d", path)
-    .append("title")
-    .text(d => d.rate + "%");
+    var path = d3.geoPath();  //d3.geoPath()
+    let basemap_fill = "none";
+
+    if(covid.length) { //only draw choropleth map if it has covid data
+      this.drawChroropleth(map, covid, path);
+    } else { 
+      basemap_fill = "#DDDDDD"; 
+    }
   
-   this.g.basemap.append("path") // draw base map
+    this.g.basemap.append("path") // draw base map
       .datum(land)
       .attr("class", "land")
       .attr("d", path)
-      .attr("fill", "none");
+      .attr("fill", basemap_fill);
       
     this.g.basemap.append("path") // draw interior borders
       .datum(topojson.mesh(map, map.objects.states, (a, b) => a !== b))
@@ -115,6 +86,35 @@ class DaVi {
       .datum(topojson.mesh(map, map.objects.states, (a, b) => a === b))
       .attr("class", "border exterior")
       .attr("d", path);
+  }
+
+  drawChroropleth(map, covid, path){
+    map.objects.states.geometries.forEach(obj => {
+      obj.deaths = 0;
+      covid.forEach(index => {
+        if(obj.properties.name === index.STATE){
+          obj.deaths += parseInt(index.DEATHS);
+        }
+      })
+    })
+
+    this.g.basemap.append("g")
+    .attr("class", "land")
+    .selectAll("path")
+    .data(topojson.feature(map, map.objects.states).features)
+    .enter().append("path")
+    .attr("fill", feature => {      
+      let fill = "rgba(150,150,150,1)";
+      map.objects.states.geometries.forEach(map_obj => {
+        if (feature.id == map_obj.id){
+          fill = "rgba("+(255-(map_obj.deaths/10))+","+(255-(map_obj.deaths/10))+","+(255-(map_obj.deaths/10))+",1)";
+        }
+      })
+      return fill;
+    })
+    .attr("d", path)
+    .append("title")
+    .text(d => d.rate + "%");
   }
 
   drawAirports() {
@@ -394,6 +394,16 @@ function typeAirport(airport) { //see airports.csv, convert gps coordinates to n
   airport.flights = [];  // eventually tracks outgoing flights
 
   return airport;
+}
+
+function typeMap(map) { //see airports.csv, convert gps coordinates to number and init degree
+  map.transform.scale[0] = 0.00507599312;
+  map.transform.scale[1] = 0.00296799503;
+  
+  map.transform.translate[0] = -30; //needs to be hardcoded
+  map.transform.translate[1] = 11.5; //needs to be hardcoded
+
+  return map;
 }
 
 function isContinental(state) {

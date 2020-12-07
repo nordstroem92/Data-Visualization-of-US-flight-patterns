@@ -151,16 +151,10 @@ class DataSet {
         })
     }
 
-
-
-
 }
 
 
 // HELPER FUNCTIONS
-
-
-
 function intersect(filter1, filter2) {
     return filter1.then(function (data1) {
         return filter2.then(function (data2) {
