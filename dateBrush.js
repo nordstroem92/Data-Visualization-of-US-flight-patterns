@@ -61,7 +61,8 @@ class DateBrush {
 
             // Add the y Axis
             svg2.append("g")
-                .call(d3.axisLeft(this.y));
+                .call(d3.axisLeft(this.y)
+                    .ticks(0));
 
             this.dontMove = true;
             this.brushG = svg2.append("g")
