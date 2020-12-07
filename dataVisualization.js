@@ -2,7 +2,7 @@ class DaVi {
   static urls = {
     map: "https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json",//"https://d3js.org/us-10m.v1.json",//"https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json", // source: https://github.com/topojson/us-atlas
     airports: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/airport_locations.csv", // source: https://gist.github.com/mbostock/7608400
-    covid: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv"
+    population_data: "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_population_data.csv" //https://worldpopulationreview.com/state-rankings/state-densities
   };
   static width  = 480;//960;
   static height = 300//600;
@@ -28,7 +28,8 @@ class DaVi {
 
     this.promises = [
       d3.json(DaVi.urls.map), 
-      d3.csv(DaVi.urls.airports, typeAirport)
+      d3.csv(DaVi.urls.airports, typeAirport),
+      d3.csv(DaVi.urls.population_data)
     ]
     Promise.all(this.promises).then(setup_values => this.initSetup(setup_values, dataset));
   }
@@ -36,6 +37,8 @@ class DaVi {
   initSetup(setup_values, dataset) { // process airport and flight data
     this.map_data = typeMap(setup_values[0]);
     this.airports = setup_values[1];
+    this.population_data = setup_values[2];
+    console.log(this.population_data);
     this.updateMap(dataset);
   }
 
