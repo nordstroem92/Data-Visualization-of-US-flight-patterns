@@ -15,13 +15,14 @@
 
 <body>
 
+<div id="loader"></div>
 <!-- must be 960x600 to match topojson us atlas files -->
 <svg id="svg_flights_2018" width="480" height="320">
   <!-- must be in this order for drawing -->
   <g class="basemap"></g>
   <g class="flights"></g>
   <g class="airports"></g>
-  <text id="tooltip" style="display: none;"></text>
+  <text class="tooltip" style="display: none;"></text>
 </svg>
 
 <svg id="svg_flights_2019" width="480" height="320">
@@ -29,7 +30,7 @@
   <g class="basemap"></g>
   <g class="flights"></g>
   <g class="airports"></g>
-  <text id="tooltip" style="display: none;"></text>
+  <text class="tooltip" style="display: none;"></text>
 </svg>
 
 <svg id="svg_flights_2020" width="480" height="320">
@@ -37,9 +38,8 @@
   <g class="basemap"></g>
   <g class="flights"></g>
   <g class="airports"></g>
-  <text id="tooltip" style="display: none;"></text>
+  <text class="tooltip" style="display: none;"></text>
 </svg>
-
 <style> /* set the CSS */
 
 .line {

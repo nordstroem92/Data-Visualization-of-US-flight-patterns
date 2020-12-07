@@ -12,7 +12,6 @@ class DaVi {
     airports: d3.scaleSqrt().range([4, 18]), // used to scale airport bubbles
     segments: d3.scaleLinear().domain([0, DaVi.hypotenuse]).range([1, 10]) // used to scale number of segments per line
   };
-  static tooltip = d3.select("text#tooltip");
   static path = d3.geoPath();  //d3.geoPath()
 
   constructor(svg_id, dataset){
@@ -25,6 +24,7 @@ class DaVi {
       airports: this.svg.select(".airports"),
       voronoi:  this.svg.select(".voronoi")
     };
+    this.tooltip = this.svg.select(".tooltip");
 
     this.promises = [
       d3.json(DaVi.urls.map), 
@@ -76,7 +76,7 @@ class DaVi {
     if(covid.length) { //only draw choropleth map if it has covid data
       this.drawChroropleth(map, covid, population_data);
     } else { 
-      basemap_fill = "#DDDDDD"; 
+      basemap_fill = "#F5F5F5"; 
     }
   
     this.g.basemap.append("path") // draw base map
@@ -105,7 +105,11 @@ class DaVi {
           obj.deaths += parseInt(index.DEATHS);
         }
       })
-      population_data.forEach(index => console.log(index.State))
+      population_data.forEach(index =>{
+        if(obj.properties.name === index.STATE){
+          obj.pop_density = parseInt(index.DENSITY);
+        }
+      })
     })
     this.g.basemap.append("g")
     .attr("class", "land")
@@ -114,9 +118,9 @@ class DaVi {
     .enter().append("path")
     .attr("fill", feature => {      
       let fill = "rgba(150,150,150,1)";
-      map.objects.states.geometries.forEach(map_obj => {
-        if (feature.id == map_obj.id){
-          fill = "rgba("+(255-(map_obj.deaths/10))+","+(255-(map_obj.deaths/10))+","+(255-(map_obj.deaths/10))+",1)";
+      map.objects.states.geometries.forEach(obj => {
+        if (feature.id == obj.id){
+          fill = "rgba("+(255-((obj.deaths/obj.pop_density)*3))+","+(255-((obj.deaths/obj.pop_density)*3))+","+(255-((obj.deaths/obj.pop_density)*3))+",1)";
         }
       })
       return fill;
@@ -127,12 +131,13 @@ class DaVi {
   }
 
   drawAirports() {
+    let tooltip = this.tooltip;
     this.g.airports.selectAll("circle.airport").remove(); 
     this.g.airports.selectAll("circle.airport") // draw airport bubbles
       .data(this.airports, d => d.ident)
       .enter()
       .append("circle")
-      .attr("r", 5)
+      .attr("r", 4)
       .attr("cx", d => d.x) // calculated on load
       .attr("cy", d => d.y) // calculated on load
       .attr("class", d => "airport " + d.ident)
@@ -149,29 +154,29 @@ class DaVi {
               .raise();
 
             // make tooltip take up space but keep it invisible
-            DaVi.tooltip.style("display", null);
-            DaVi.tooltip.style("visibility", "hidden");
+            tooltip.style("display", null);
+            tooltip.style("visibility", "hidden");
 
             // set default tooltip positioning
-            DaVi.tooltip.attr("text-anchor", "middle");
-            DaVi.tooltip.attr("dy", -15);
-            DaVi.tooltip.attr("x", d.x);
-            DaVi.tooltip.attr("y", d.y);
+            tooltip.attr("text-anchor", "middle");
+            tooltip.attr("dy", -15);
+            tooltip.attr("x", d.x);
+            tooltip.attr("y", d.y);
 
             // set the tooltip text
-            DaVi.tooltip.text(d.name);
+            tooltip.text(d.name);
 
             // double check if the anchor needs to be changed
-            let bbox = DaVi.tooltip.node().getBBox();
+            let bbox = tooltip.node().getBBox();
 
             if (bbox.x <= 0) {
-                DaVi.tooltip.attr("text-anchor", "start");
+                tooltip.attr("text-anchor", "start");
             }
             else if (bbox.x + bbox.width >= DaVi.width) {
-                DaVi.tooltip.attr("text-anchor", "end");
+                tooltip.attr("text-anchor", "end");
             }
 
-            DaVi.tooltip.style("visibility", "visible");
+            tooltip.style("visibility", "visible");
         })
       .on("mouseout", function(d) {
             d3.select(this)
@@ -180,7 +185,7 @@ class DaVi {
           d3.selectAll(d.flights)
               .classed("highlight", false);
 
-            d3.select("text#tooltip").style("visibility", "hidden");
+            tooltip.style("visibility", "hidden");
         });
       setupOnClick();
   }
@@ -226,6 +231,7 @@ class DaVi {
          links.attr("d", line);
        })
        .on("end", function(d) {
+         document.getElementById("loader").style.display = "none";
          console.log("layout complete");
        });
    
@@ -244,6 +250,7 @@ class DaVi {
    }
 
    drawPolygons() {
+    let tooltip = this.tooltip;
     // convert array of airports into geojson format
     const geojson = this.airports.map(function(airport) {
       return {
@@ -275,29 +282,29 @@ class DaVi {
           .raise();
   
         // make tooltip take up space but keep it invisible
-        DaVi.tooltip.style("display", null);
-        DaVi.tooltip.style("visibility", "hidden");
+        tooltip.style("display", null);
+        tooltip.style("visibility", "hidden");
   
         // set default tooltip positioning
-        DaVi.tooltip.attr("text-anchor", "middle");
-        DaVi.tooltip.attr("dy", -15);
-        DaVi.tooltip.attr("x", airport.x);
-        DaVi.tooltip.attr("y", airport.y);
+        tooltip.attr("text-anchor", "middle");
+        tooltip.attr("dy", -15);
+        tooltip.attr("x", airport.x);
+        tooltip.attr("y", airport.y);
   
         // set the tooltip text
-        DaVi.tooltip.text(airport.name);
+        tooltip.text(airport.name);
   
         // double check if the anchor needs to be changed
-        let bbox = DaVi.tooltip.node().getBBox();
+        let bbox = tooltip.node().getBBox();
   
         if (bbox.x <= 0) {
-          DaVi.tooltip.attr("text-anchor", "start");
+          tooltip.attr("text-anchor", "start");
         }
         else if (bbox.x + bbox.width >= DaVi.width) {
-          DaVi.tooltip.attr("text-anchor", "end");
+          tooltip.attr("text-anchor", "end");
         }
   
-        DaVi.tooltip.style("visibility", "visible");
+          tooltip.style("visibility", "visible");
       })
       .on("mouseout", function(d) {
         let airport = d.properties.site.properties;
@@ -308,7 +315,7 @@ class DaVi {
         d3.selectAll(airport.flights)
           .classed("highlight", false);
   
-        d3.select("text#tooltip").style("visibility", "hidden");
+        tooltip.style("visibility", "hidden");
       })
   }
   generateSegments(nodes, links) { //this.airports, flights

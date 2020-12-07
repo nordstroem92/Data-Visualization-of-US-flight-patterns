@@ -14,11 +14,11 @@ body {
 }
 
 .interior {
-  stroke: white;
+  stroke: rgb(169, 169, 169);/*white;*/
 }
 
 .exterior {
-  stroke: #bbbbbb;
+  stroke:  rgb(169, 169, 169); /* #bbbbbb;*/
 }
 
 .airport {
@@ -42,7 +42,7 @@ body {
 .highlight {
   opacity: 1 !important;
   stroke: red !important;
-  stroke-width: 2px !important;
+  stroke-width: 1px !important;
   stroke-opacity: 0.8 !important;
 }
 
@@ -51,9 +51,36 @@ g.voronoi {
 }
 
 /* shadow trick from bl.ocks.org */
-#tooltip {
+.tooltip {
   font-size: 10pt;
   font-weight: 900;
   fill: white;
   text-shadow: 1px 1px 0 #252525, 1px -1px 0 #252525, -1px 1px 0 #252525, -1px -1px 0 #252525;
+}
+
+#loader { /*loading screen*/
+  border: 16px solid #b5b5b5;
+  border-radius: 50%;
+  border-top: 16px solid #3dffbb;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  margin-left: -60px;
+  margin-top: -60px;
+  width: 120px;
+  height: 120px;
+  display: none;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

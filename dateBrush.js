@@ -75,7 +75,11 @@ class DateBrush {
 
             let updateButton = d3.select("#updateButton")
                 .text("Update Data")
-                .on("click", () => new Promise(resolve => resolve(DateBrush.updateViews())));
+                .on("click", () => {
+                    document.getElementById("loader").style.display = "block";
+                    new Promise(resolve => 
+                        resolve(DateBrush.updateViews()))
+                });
 
             if(!textEnabled) return;
 
