@@ -144,7 +144,7 @@ class DataSet {
 
     static readSum(year){
         return d3.csv("Data/sum_flights_" + year + ".csv").then((data) => {
-        //return d3.csv("https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/flights_" + year + ".csv").then((data) => {
+        //return d3.csv("https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/sum_flights_" + year + ".csv").then((data) => { //Jeg får stadig CORS errors med lokale filer :-(
             for (let i = 0; i < data.length; i++) {
                 data[i].DATE = new Date(+data[i].DATE);
             }
@@ -152,16 +152,10 @@ class DataSet {
         })
     }
 
-
-
-
 }
 
 
 // HELPER FUNCTIONS
-
-
-
 function intersect(filter1, filter2) {
     return filter1.then(function (data1) {
         return filter2.then(function (data2) {
