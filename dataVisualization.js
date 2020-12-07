@@ -38,7 +38,6 @@ class DaVi {
     this.map_data = typeMap(setup_values[0]);
     this.airports = setup_values[1];
     this.population_data = setup_values[2];
-    console.log(this.population_data);
     this.updateMap(dataset);
   }
 
@@ -67,6 +66,7 @@ class DaVi {
   drawMap(covid_data) { // DRAW UNDERLYING MAP
     let map = this.map_data;
     let covid = covid_data;
+    let population_data = this.population_data;
 
     map.objects.states.geometries = map.objects.states.geometries.filter(isContinental);
     let land = topojson.merge(map, map.objects.states.geometries); // run topojson on remaining states and adjust projection
@@ -74,7 +74,7 @@ class DaVi {
     let basemap_fill = "none";
 
     if(covid.length) { //only draw choropleth map if it has covid data
-      this.drawChroropleth(map, covid);
+      this.drawChroropleth(map, covid, population_data);
     } else { 
       basemap_fill = "#DDDDDD"; 
     }
@@ -96,14 +96,16 @@ class DaVi {
       .attr("d", DaVi.path);
   }
 
-  drawChroropleth(map, covid){
+  drawChroropleth(map, covid, population_data){
     map.objects.states.geometries.forEach(obj => {
       obj.deaths = 0;
+      obj.pop_density = 0;
       covid.forEach(index => {
         if(obj.properties.name === index.STATE){
           obj.deaths += parseInt(index.DEATHS);
         }
       })
+      population_data.forEach(index => console.log(index.State))
     })
     this.g.basemap.append("g")
     .attr("class", "land")
