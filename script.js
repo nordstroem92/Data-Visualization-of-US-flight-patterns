@@ -12,3 +12,9 @@ let dataset_3 = new DataSet("https://raw.githubusercontent.com/nordstroem92/data
 dataset_1.refresh().then(data => visualization1 = new DaVi("#svg_flights_2018", data));
 dataset_2.refresh().then(data => visualization2 = new DaVi("#svg_flights_2019", data));
 dataset_3.refresh().then(data => visualization3 = new DaVi("#svg_flights_2020", data));
+
+let dateBrush_1 = new DateBrush(2018, false);
+let dateBrush_2 = new DateBrush(2019, false);
+let dateBrush_3 = new DateBrush(2020, true);
+DateBrush.brushesList =  [dateBrush_1, dateBrush_2, dateBrush_3];
+DateBrush.defaultSelectionObject = dateBrush_3;

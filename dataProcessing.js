@@ -21,7 +21,8 @@ class DataSet {
                 });
             }).then(flightData => {
                 return new Promise((resolve, reject) => {
-                    d3.csv(coronaFileName)
+                    if(coronaFileName === null) resolve([flightData, []]);
+                    else d3.csv(coronaFileName)
                         .then(data => {
                             for (let i = 0; i < data.length; i++) {
                                 let d = data[i];
