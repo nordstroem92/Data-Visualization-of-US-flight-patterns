@@ -26,6 +26,9 @@ body {
   opacity: 0.6;
   stroke: #252525;
 }
+.airport:hover {
+  cursor: pointer;
+}
 
 .flight {
   fill: none;
@@ -61,7 +64,7 @@ g.voronoi {
 }
 
 .handle {
-  fill: black;
+  fill: #334E66;
   width: 3px;
 }
 
@@ -78,21 +81,21 @@ g.voronoi {
 }
 
 #selectionBox {
-  border: 1px dotted #000;
+  border: 1px solid rgb(27, 51, 70);
   position: absolute;
+  background-color: rgba(27, 51, 70, 0.2);
 }
 
 .deselectionBox {
   border: 1px dotted red !important;
 }
-
-.noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Old versions of Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+.noselect, .html > * {
+  -webkit-touch-callout: none !important; /* iOS Safari */
+  -webkit-user-select: none !important; /* Safari */
+  -khtml-user-select: none !important; /* Konqueror HTML */
+  -moz-user-select: none !important; /* Old versions of Firefox */
+  -ms-user-select: none !important; /* Internet Explorer/Edge */
+  user-select: none !important; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
 }
 .input-container{
   text-align: left;

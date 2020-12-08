@@ -148,7 +148,7 @@ class DaVi {
       })
       .on("mouseover", function (d) {
 
-            d3.select(this)
+          d3.select(this)
                 .classed("highlight", true);
 
           d3.selectAll(d.flights)
