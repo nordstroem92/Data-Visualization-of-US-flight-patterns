@@ -61,7 +61,7 @@ class DaVi {
 
         this.flightColor = d3.scaleLinear()
             .domain([0, this.maxFlightCount/3, this.maxFlightCount*2/3, this.maxFlightCount])
-            .range(['#fee5d9','#fcae91','#fb6a4a','#de2d26'])
+            .range(['#edf8e9','#bae4b3','#74c476','#31a354','#006d2c'])
             .interpolate(d3.interpolateHcl);
 
         this.coronaColor = d3.scaleLinear()
@@ -208,12 +208,17 @@ class DaVi {
             .append("path")
             .attr("d", line)
             .attr("class", "flight")
-            .attr("stroke-width", d => d[1].weight / this.maxFlightCount) //d => d.length/3
+            .attr("stroke-width", d => {
+                let width = d[1].weight/this.totalFlights*3000.0;
+                console.log(width);
+                return width;
+            }) //d => d.length/3
             .attr("stroke", (d) => {
-                let color = this.flightColor(d[1].weight);
-                let res = color.split("(");
-                let res2 = res[1].split(")");
-                return "rgba(" + res2[0] + ",0.8)";
+                //let color = this.flightColor(d[1].weight);
+                //let res = color.split("(");
+                //let res2 = res[1].split(")");
+                //return "rgba(" + res2[0] + ",0.8)";
+                return "rgba(0,109,44,0.6)";
             })//d => "rgba(0,0,180,"+(d.length/2)+")")
             .each(function (d) {
                 d[0].flights.push(this); // adds the path object to our source airport, makes it fast to select outgoing paths

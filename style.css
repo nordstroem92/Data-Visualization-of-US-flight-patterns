@@ -89,7 +89,7 @@ g.voronoi {
 .deselectionBox {
   border: 1px dotted red !important;
 }
-.noselect, .html > * {
+.noselect, html > * {
   -webkit-touch-callout: none !important; /* iOS Safari */
   -webkit-user-select: none !important; /* Safari */
   -khtml-user-select: none !important; /* Konqueror HTML */
