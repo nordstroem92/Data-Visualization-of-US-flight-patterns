@@ -50,8 +50,6 @@ class DaVi {
         this.flights = this.flights_dataset[0];
         this.corona = this.corona_dataset[0]
 
-        console.log(this.corona);
-
         this.totalFlights = this.flights_dataset[1];
         this.maxFlightCount = this.flights_dataset[2];
 
@@ -62,13 +60,13 @@ class DaVi {
         this.links = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0, 1]);
 
         this.flightColor = d3.scaleLinear()
-            .domain([0, this.maxFlightCount])
-            .range(['#08306b', '#08519c', '#2171b5', '#4292c6', '#6baed6', '#9ecae1', '#c6dbef', '#deebf7', '#f7fbff'])
+            .domain([0, this.maxFlightCount/3, this.maxFlightCount*2/3, this.maxFlightCount])
+            .range(['#fee5d9','#fcae91','#fb6a4a','#de2d26'])
             .interpolate(d3.interpolateHcl);
 
         this.coronaColor = d3.scaleLinear()
-            .domain([0, this.maxDeathCount])
-            .range(['#08306b', '#08519c', '#2171b5', '#4292c6', '#6baed6', '#9ecae1', '#c6dbef', '#deebf7', '#f7fbff'])
+            .domain([0, this.maxDeathCount/3, this.maxDeathCount*2/3, this.maxDeathCount])
+            .range(['#f7f7f7','#cccccc','#969696','#636363'])
             .interpolate(d3.interpolateHcl);
 
 
@@ -142,10 +140,11 @@ class DaVi {
                     let obj = covid[i];
                     //console.log(feature.properties.name, obj.STATE);
                     if(feature.properties.name !== obj.STATE) continue;
-                    //let relative_deaths = obj.RELATIVE_DEATHS;
-                    console.log(obj);
+                    //console.log(obj);
+                    let relative_deaths = obj.DEATHS;
+                    if(relative_deaths > this.maxDeathCount) console.log(obj.STATE, obj.DEATHS, this.maxDeathCount);
+                    if(relative_deaths === this.maxDeathCount) console.log(obj.STATE, obj.DEATHS, this.maxDeathCount);
                     let color = this.coronaColor(relative_deaths);
-                    //console.log(relative_deaths, color);
                     let res = color.split("(");
                     let res2 = res[1].split(")");
                     return "rgba(" + res2[0] + ",1)";
@@ -243,7 +242,7 @@ class DaVi {
             .append("path")
             .attr("d", line)
             .attr("class", "flight")
-            .attr("stroke-width", d => d[1].weight / this.maxFlightCount * 2.0) //d => d.length/3
+            .attr("stroke-width", d => d[1].weight / this.maxFlightCount) //d => d.length/3
             .attr("stroke", (d) => {
                 let color = this.flightColor(d[1].weight);
                 let res = color.split("(");

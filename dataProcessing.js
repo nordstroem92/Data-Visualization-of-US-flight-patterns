@@ -81,7 +81,6 @@ class DataSet {
                 if (coronaDateFilter && coronaDayOfWeekFilter) {
                     let deathVal = parseFloat(corona.RELATIVE_DEATHS);
                     totalDeaths += deathVal;
-                    if (deathVal > maxDeathCount) maxDeathCount = deathVal;
 
                     let coronaIndex = listContainsState(coronaAggregatedData, corona);
                     if (coronaIndex !== -1) {
@@ -90,6 +89,8 @@ class DataSet {
                         "STATE": corona.STATE,
                         "DEATHS": deathVal
                     });
+                    let summedDeathVal = coronaAggregatedData[coronaAggregatedData.length - 1].DEATHS;
+                    if (summedDeathVal > maxDeathCount) maxDeathCount = summedDeathVal;
                 }
 
                 if (!(dateFilter && dayOfWeekFilter && geoFilter())) continue;
@@ -106,7 +107,8 @@ class DataSet {
                     "DESTINATION": flight.DESTINATION,
                     "FLIGHTCOUNT": +flight.FLIGHTCOUNT
                 });
-                if (flightVal > maxFlightCount) maxFlightCount = +flightVal;
+                let summedFlightCount = aggregatedData[aggregatedData.length - 1].FLIGHTCOUNT;
+                if (summedFlightCount > maxFlightCount) maxFlightCount = summedFlightCount;
             }
 
             for (let i = 0; i < coronaData.length; i++) {
