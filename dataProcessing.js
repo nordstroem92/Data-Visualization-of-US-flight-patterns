@@ -58,6 +58,8 @@ class DataSet {
             let coronaAggregatedData = [];
             let totalFlights = 0;
             let maxFlightCount = 0;
+            let maxDeathCount = 0;
+            let totalDeaths = 0;
             for (let i = 0; i < flightData.length; i++) {
                 let flight = flightData[i];
                 let checkCorona = i < coronaData.length;
@@ -77,12 +79,16 @@ class DataSet {
                 }
 
                 if (coronaDateFilter && coronaDayOfWeekFilter) {
+                    let deathVal = parseFloat(corona.RELATIVE_DEATHS);
+                    totalDeaths += deathVal;
+                    if (deathVal > maxDeathCount) maxDeathCount = deathVal;
+
                     let coronaIndex = listContainsState(coronaAggregatedData, corona);
                     if (coronaIndex !== -1) {
-                        coronaAggregatedData[coronaIndex].DEATHS += +corona.NEW_DEATHS;
+                        coronaAggregatedData[coronaIndex].DEATHS += deathVal;
                     } else coronaAggregatedData.push({
                         "STATE": corona.STATE,
-                        "DEATHS": +corona.NEW_DEATHS
+                        "DEATHS": deathVal
                     });
                 }
 
@@ -107,7 +113,7 @@ class DataSet {
 
             }
 
-            return [[aggregatedData, totalFlights, maxFlightCount], coronaAggregatedData];
+            return [[aggregatedData, totalFlights, maxFlightCount], [coronaAggregatedData, totalDeaths, maxDeathCount]];
         });
         return this.aggregated;
     }
