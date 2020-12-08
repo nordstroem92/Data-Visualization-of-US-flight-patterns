@@ -58,6 +58,8 @@ class DataSet {
             let coronaAggregatedData = [];
             let totalFlights = 0;
             let maxFlightCount = 0;
+            let maxDeathCount = 0;
+            let totalDeaths = 0;
             for (let i = 0; i < flightData.length; i++) {
                 let flight = flightData[i];
                 let checkCorona = i < coronaData.length;
@@ -77,13 +79,18 @@ class DataSet {
                 }
 
                 if (coronaDateFilter && coronaDayOfWeekFilter) {
+                    let deathVal = parseFloat(corona.RELATIVE_DEATHS);
+                    totalDeaths += deathVal;
+
                     let coronaIndex = listContainsState(coronaAggregatedData, corona);
                     if (coronaIndex !== -1) {
-                        coronaAggregatedData[coronaIndex].DEATHS += +corona.NEW_DEATHS;
+                        coronaAggregatedData[coronaIndex].DEATHS += deathVal;
                     } else coronaAggregatedData.push({
                         "STATE": corona.STATE,
-                        "DEATHS": +corona.NEW_DEATHS
+                        "DEATHS": deathVal
                     });
+                    let summedDeathVal = coronaAggregatedData[coronaAggregatedData.length - 1].DEATHS;
+                    if (summedDeathVal > maxDeathCount) maxDeathCount = summedDeathVal;
                 }
 
                 if (!(dateFilter && dayOfWeekFilter && geoFilter())) continue;
@@ -100,14 +107,15 @@ class DataSet {
                     "DESTINATION": flight.DESTINATION,
                     "FLIGHTCOUNT": +flight.FLIGHTCOUNT
                 });
-                if (flightVal > maxFlightCount) maxFlightCount = +flightVal;
+                let summedFlightCount = aggregatedData[aggregatedData.length - 1].FLIGHTCOUNT;
+                if (summedFlightCount > maxFlightCount) maxFlightCount = summedFlightCount;
             }
 
             for (let i = 0; i < coronaData.length; i++) {
 
             }
 
-            return [[aggregatedData, totalFlights, maxFlightCount], coronaAggregatedData];
+            return [[aggregatedData, totalFlights, maxFlightCount], [coronaAggregatedData, totalDeaths, maxDeathCount]];
         });
         return this.aggregated;
     }

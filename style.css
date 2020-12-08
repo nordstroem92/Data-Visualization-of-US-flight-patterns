@@ -44,9 +44,9 @@ body {
 
 .highlight {
   opacity: 1 !important;
-  stroke: red !important;
-  stroke-width: 1px !important;
-  stroke-opacity: 0.8 !important;
+  stroke: #189f1d !important;
+  stroke-width: 2px !important;
+  stroke-opacity: 0.9 !important;
 }
 
 g.voronoi {

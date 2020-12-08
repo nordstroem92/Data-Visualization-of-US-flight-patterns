@@ -20,7 +20,7 @@ function reCalc() {
 }
 
 onmousedown = function(e) {
-    isCtrlHeld = e.ctrlKey;
+    isCtrlHeld = e.ctrlKey || e.altKey;
     buttonHeld = true;
     if(isCtrlHeld) d3.select(div).classed("deselectionBox", true);
     x1 = e.pageX; //Set the initial X
