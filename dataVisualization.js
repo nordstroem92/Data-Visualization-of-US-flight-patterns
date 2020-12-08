@@ -111,23 +111,6 @@ class DaVi {
     }
 
     drawChroropleth(map, covid, population_data) {
-        /*
-        map.objects.states.geometries.forEach(obj => {
-            obj.deaths = 0;
-            obj.pop_density = 0;
-            for (let i = 0; i < covid.length; i++) {
-                if (obj.properties.name !== covid[i].STATE) continue;
-                obj.deaths = +covid[i].DEATHS;
-                break;
-            }
-            for (let i=0; i < population_data.length; i++){
-                let val = population_data[i];
-                if(obj.properties.name !== val.STATE) continue;
-                obj.pop_density = parseFloat(val.DENSITY);
-                break;
-            }
-        });
-         */
         this.g.basemap.append("g")
             .attr("class", "land")
             .selectAll("path")
@@ -135,33 +118,16 @@ class DaVi {
             .enter().append("path")
             .attr("fill", feature => {
                 let defaultColor = "rgba(150,150,150,1)";
-                //console.log(feature.properties.name);
                 for(let i=0; i< covid.length; i++){
                     let obj = covid[i];
-                    //console.log(feature.properties.name, obj.STATE);
                     if(feature.properties.name !== obj.STATE) continue;
-                    //console.log(obj);
                     let relative_deaths = obj.DEATHS;
-                    if(relative_deaths > this.maxDeathCount) console.log(obj.STATE, obj.DEATHS, this.maxDeathCount);
-                    if(relative_deaths === this.maxDeathCount) console.log(obj.STATE, obj.DEATHS, this.maxDeathCount);
                     let color = this.coronaColor(relative_deaths);
                     let res = color.split("(");
                     let res2 = res[1].split(")");
                     return "rgba(" + res2[0] + ",1)";
                 }
 
-                /*
-                for(let i=0; i< map.objects.states.geometries.length; i++){
-                    let obj = map.objects.states.geometries[i];
-                    if(feature.id !== obj.id) continue;
-                    let relative_deaths = obj.deaths/obj.pop_density;
-                    let color = this.coronaColor(relative_deaths);
-                    let res = color.split("(");
-                    let res2 = res[1].split(")");
-                    return "rgba(" + res2[0] + ",1)";
-                }
-
-                 */
                 return defaultColor;
             })
             .attr("d", DaVi.path)
@@ -247,7 +213,7 @@ class DaVi {
                 let color = this.flightColor(d[1].weight);
                 let res = color.split("(");
                 let res2 = res[1].split(")");
-                return "rgba(" + res2[0] + ",1)";
+                return "rgba(" + res2[0] + ",0.8)";
             })//d => "rgba(0,0,180,"+(d.length/2)+")")
             .each(function (d) {
                 d[0].flights.push(this); // adds the path object to our source airport, makes it fast to select outgoing paths
