@@ -56,6 +56,8 @@ class DaVi {
         this.totalDeaths = this.corona_dataset[1];
         this.maxDeathCount = this.corona_dataset[2];
 
+        this.lineThickness = d3.scaleLinear().domain([0, this.maxFlightCount/this.totalFlights]).range([0, 2]);
+
         this.strengths = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0, 25 / 2]);
         this.links = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0, 1]);
 
@@ -150,12 +152,14 @@ class DaVi {
                 d.bubble = this; // adds the circle object to our airport, makes it fast to select airports on hover
             })
             .on("mouseover", function (d) {
+
                 d3.select(this)
                     .classed("highlight", true);
 
                 d3.selectAll(d.flights)
                     .classed("highlight", true)
                     .raise();
+
 
                 // make tooltip take up space but keep it invisible
                 tooltip.style("display", null);
@@ -209,9 +213,8 @@ class DaVi {
             .attr("d", line)
             .attr("class", "flight")
             .attr("stroke-width", d => {
-                let width = d[1].weight/this.totalFlights*3000.0;
-                console.log(width);
-                return width;
+                let width = d[1].weight / this.totalFlights;
+                return this.lineThickness(width);
             }) //d => d.length/3
             .attr("stroke", (d) => {
                 //let color = this.flightColor(d[1].weight);
