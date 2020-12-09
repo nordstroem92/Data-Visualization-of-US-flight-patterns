@@ -58,8 +58,8 @@ class DaVi {
 
         this.lineThickness = d3.scaleLinear().domain([0, this.maxFlightCount/this.totalFlights]).range([0, 2]);
 
-        this.strengths = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0, 25 / 2]);
-        this.links = d3.scaleLinear().domain([0, this.maxFlightCount]).range([0, 1]);
+        this.strengths = d3.scaleLinear().domain([0, this.totalFlights]).range([0, 25 / 2]);
+        this.links = d3.scaleLinear().domain([0, this.totalFlights]).range([0, 1]);
 
         this.flightColor = d3.scaleLinear()
             .domain([0, this.maxFlightCount/3, this.maxFlightCount*2/3, this.maxFlightCount])
@@ -231,11 +231,11 @@ class DaVi {
             .alphaDecay(0.5) // settle at a layout faster
 
             .force("charge", d3.forceManyBody() // nearby nodes attract each other
-                .strength(d => this.strengths(d.outgoing)*0.2)//0.2
+                .strength(d => this.strengths(d.outgoing*200))//0.2
                 .distanceMax(100)
             )
             .force("link", d3.forceLink() // edges want to be as short as possible, prevents too much stretching
-                .strength(d => this.links(d.weight)*0.65) //0.6
+                .strength(d => this.links(d.weight)*0.3) //0.6
                 .distance(1)
             )
             .on("tick", function (d) {
