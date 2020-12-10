@@ -44,7 +44,7 @@ body {
 
 .highlight {
   opacity: 1 !important;
-  stroke: #189f1d !important;
+  stroke: rgb(0,178,255) !important;
   stroke-width: 2px !important;
   stroke-opacity: 0.9 !important;
 }
@@ -59,7 +59,7 @@ g.voronoi {
 }
 .line {
   fill: none;
-  stroke: steelblue;
+  stroke: rgb(255,77,0);  /*steelblue;*/
   stroke-width: 2px;
 }
 

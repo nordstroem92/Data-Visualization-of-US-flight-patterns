@@ -221,7 +221,7 @@ class DaVi {
                 //let res = color.split("(");
                 //let res2 = res[1].split(")");
                 //return "rgba(" + res2[0] + ",0.8)";
-                return "rgba(0,109,44,0.6)";
+                return "rgba(255,77,0,0.8)";
             })//d => "rgba(0,0,180,"+(d.length/2)+")")
             .each(function (d) {
                 d[0].flights.push(this); // adds the path object to our source airport, makes it fast to select outgoing paths
