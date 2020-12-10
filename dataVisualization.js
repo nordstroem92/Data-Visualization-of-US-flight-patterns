@@ -76,7 +76,7 @@ class DaVi {
 
         if(this.totalDeaths !== 0 ) legend = new ColorLegend({
             color: this.coronaColor,
-            title: "Corona Deaths/Population Density",
+            title: "Corona Deaths/Population Density", 
         });
 
 

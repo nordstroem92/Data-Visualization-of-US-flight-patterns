@@ -5,7 +5,7 @@ class ColorLegend{
                     title,
                     tickSize = 6,
                     width = 320,
-                    height = 44 + tickSize,
+                    height = 60 + tickSize,
                     marginTop = 18,
                     marginRight = 0,
                     marginBottom = 16 + tickSize,
@@ -25,7 +25,8 @@ class ColorLegend{
             .attr("height", height)
             .attr("viewBox", [0, 0, width, height])
             .style("overflow", "visible")
-            .style("display", "block");
+            .style("display", "block")
+            .style("transform", "rotate(-90deg)")
 
         const n = Math.min(color.domain().length, color.range().length);
 
@@ -49,11 +50,12 @@ class ColorLegend{
             .call(tickAdjust)
             .call(g => g.select(".domain").remove())
             .call(g => g.append("text")
-                .attr("x", marginLeft)
-                .attr("y", marginTop + marginBottom - height - 6)
+                .attr("x", -140)
+                .attr("y", -340)//marginTop + marginBottom - height + 30)
                 .attr("fill", "currentColor")
                 .attr("text-anchor", "start")
                 .attr("font-weight", "bold")
+                .style("transform","rotate(90deg)")
                 .text(title));
 
     }
