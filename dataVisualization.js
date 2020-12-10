@@ -131,6 +131,7 @@ class DaVi {
                 for(let i=0; i< covid.length; i++){
                     let obj = covid[i];
                     if(feature.properties.name !== obj.STATE) continue;
+                    feature.properties.deaths = obj.DEATHS;
                     let percentage = obj.DEATHS/this.totalDeaths;
                     let color = this.coronaColor(percentage);
                     let res = color.split("(");
@@ -142,7 +143,11 @@ class DaVi {
             })
             .attr("d", DaVi.path)
             .append("title")
-            .text(d => d.rate + "%");
+            .text(d => {
+                let rounded = Math.floor(d.properties.deaths*100)/100.0;
+                let percentage = Math.floor(d.properties.deaths/this.totalDeaths*100)/100.0;
+                return d.properties.name + ": " + rounded + " (" + percentage + "%)";
+            });
     }
 
     drawAirports() {
