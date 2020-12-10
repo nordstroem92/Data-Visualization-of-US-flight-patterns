@@ -67,9 +67,17 @@ class DaVi {
             .interpolate(d3.interpolateHcl);
 
         this.coronaColor = d3.scaleLinear()
-            .domain([0, this.maxDeathCount/3, this.maxDeathCount*2/3, this.maxDeathCount])
+            .domain([0, 0.3/3, 0.3*2/3, 0.3])
             .range(['#f7f7f7','#cccccc','#969696','#636363'])
             .interpolate(d3.interpolateHcl);
+
+
+        let legend = null;
+
+        if(this.totalDeaths !== 0 ) legend = new ColorLegend({
+            color: this.coronaColor,
+            title: "Corona Deaths/Population Density",
+        });
 
 
         this.drawMap(this.corona);
@@ -123,8 +131,8 @@ class DaVi {
                 for(let i=0; i< covid.length; i++){
                     let obj = covid[i];
                     if(feature.properties.name !== obj.STATE) continue;
-                    let relative_deaths = obj.DEATHS;
-                    let color = this.coronaColor(relative_deaths);
+                    let percentage = obj.DEATHS/this.totalDeaths;
+                    let color = this.coronaColor(percentage);
                     let res = color.split("(");
                     let res2 = res[1].split(")");
                     return "rgba(" + res2[0] + ",1)";
