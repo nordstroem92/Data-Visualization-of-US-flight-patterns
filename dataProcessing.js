@@ -79,40 +79,43 @@ class DataSet {
                 }
 
                 if (coronaDateFilter && coronaDayOfWeekFilter) {
+                    let summedDeathVal = 0;
                     let deathVal = parseFloat(corona.RELATIVE_DEATHS);
                     totalDeaths += deathVal;
 
                     let coronaIndex = listContainsState(coronaAggregatedData, corona);
                     if (coronaIndex !== -1) {
                         coronaAggregatedData[coronaIndex].DEATHS += deathVal;
-                    } else coronaAggregatedData.push({
-                        "STATE": corona.STATE,
-                        "DEATHS": deathVal
-                    });
-                    let summedDeathVal = coronaAggregatedData[coronaAggregatedData.length - 1].DEATHS;
+                        summedDeathVal = coronaAggregatedData[coronaIndex].DEATHS;
+                    } else{
+                        coronaAggregatedData.push({
+                            "STATE": corona.STATE,
+                            "DEATHS": deathVal
+                        });
+                        summedDeathVal = coronaAggregatedData[coronaAggregatedData.length - 1].DEATHS;
+                    }
                     if (summedDeathVal > maxDeathCount) maxDeathCount = summedDeathVal;
                 }
 
                 if (!(dateFilter && dayOfWeekFilter && geoFilter())) continue;
 
-                totalFlights += +flight.FLIGHTCOUNT;
+                let summedFlightVal = 0;
                 let flightVal = +flight.FLIGHTCOUNT;
+                totalFlights += flightVal;
 
                 let flightIndex = listContainsFlight(aggregatedData, flight);
                 if (flightIndex !== -1) {
-                    aggregatedData[flightIndex].FLIGHTCOUNT += +flight.FLIGHTCOUNT;
-                    flightVal = aggregatedData[flightIndex].FLIGHTCOUNT;
-                } else aggregatedData.push({
-                    "ORIGIN": flight.ORIGIN,
-                    "DESTINATION": flight.DESTINATION,
-                    "FLIGHTCOUNT": +flight.FLIGHTCOUNT
-                });
-                let summedFlightCount = aggregatedData[aggregatedData.length - 1].FLIGHTCOUNT;
-                if (summedFlightCount > maxFlightCount) maxFlightCount = summedFlightCount;
-            }
-
-            for (let i = 0; i < coronaData.length; i++) {
-
+                    aggregatedData[flightIndex].FLIGHTCOUNT += flightVal;
+                    summedFlightVal = aggregatedData[flightIndex].FLIGHTCOUNT;
+                } else {
+                    aggregatedData.push({
+                        "ORIGIN": flight.ORIGIN,
+                        "DESTINATION": flight.DESTINATION,
+                        "FLIGHTCOUNT": flightVal
+                    });
+                    summedFlightVal = aggregatedData[aggregatedData.length - 1].FLIGHTCOUNT;
+                }
+                if (summedFlightVal > maxFlightCount) maxFlightCount = summedFlightVal;
             }
 
             return [[aggregatedData, totalFlights, maxFlightCount], [coronaAggregatedData, totalDeaths, maxDeathCount]];

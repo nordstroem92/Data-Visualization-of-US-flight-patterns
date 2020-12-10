@@ -56,7 +56,7 @@ class DaVi {
         this.totalDeaths = this.corona_dataset[1];
         this.maxDeathCount = this.corona_dataset[2];
 
-        this.lineThickness = d3.scaleLinear().domain([0, this.maxFlightCount/this.totalFlights]).range([0, 2]);
+        this.lineThickness = d3.scaleLinear().domain([0, this.maxFlightCount/this.totalFlights]).range([0, 3]);
 
         this.strengths = d3.scaleLinear().domain([0, this.totalFlights]).range([0, 25 / 2]);
         this.links = d3.scaleLinear().domain([0, this.totalFlights]).range([0, 1]);
@@ -221,7 +221,8 @@ class DaVi {
             .attr("d", line)
             .attr("class", "flight")
             .attr("stroke-width", d => {
-                let width = d[1].weight / this.totalFlights;
+                let width = d[1].weight/this.totalFlights;
+                //if(d[1].weight > this.maxFlightCount) console.log(d[1].weight, this.maxFlightCount, this.totalFlights);
                 return this.lineThickness(width);
             }) //d => d.length/3
             .attr("stroke", (d) => {
