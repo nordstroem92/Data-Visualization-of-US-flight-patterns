@@ -16,7 +16,7 @@
 <body>
 
 <div id="loader"></div>
-<!-- must be 960x600 to match topojson us atlas files -->
+<div style="margin-top: 50px; position: relative; left: -40px">
   <svg id="svg_flights_2018" width="480" height="320">
     <text x="180" y="10" dy=".35em">Flights 2018</text>
     <!-- must be in this order for drawing -->
@@ -44,9 +44,7 @@
     <text class="tooltip" style="display: none;"></text>
   </svg>
   <div id="datebrush-container"></div>
-
-<div class="legend"></div>
-
+  <div class="legend" style="position: relative; margin-right: -50px; top: -300px; left: 88vw;"></div>
 <div class="all-panels-container">
   <div class="input-container geo-panel" id="geo_options">
     <p><b>Geo options</b></p>
@@ -82,6 +80,7 @@
   <div class="btn-div">
     <button id="updateButton">Update Data</button>
   </div>
+</div>
 </div>
 
 <div id="selectionBox" hidden></div>
