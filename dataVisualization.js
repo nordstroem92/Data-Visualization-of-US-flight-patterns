@@ -144,9 +144,9 @@ class DaVi {
             .attr("d", DaVi.path)
             .append("title")
             .text(d => {
-                let rounded = Math.floor(d.properties.deaths*100)/100.0;
-                let percentage = Math.floor(d.properties.deaths/this.totalDeaths*100)/100.0;
-                return d.properties.name + ": " + rounded + " (" + percentage + "%)";
+                let rounded = Math.floor(d.properties.deaths)/100.0;
+                let percentage = Math.floor(d.properties.deaths/this.totalDeaths*100);
+                return d.properties.name + ": " + percentage + "%";
             });
     }
 
