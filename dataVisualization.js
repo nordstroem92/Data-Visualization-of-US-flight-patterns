@@ -16,7 +16,8 @@ class DaVi {
 
     static updating = 0;
 
-    constructor(svg_id, dataset) {
+    constructor(svg_id, dataset, minMaxFlightCount) {
+        this.fcConstant = minMaxFlightCount;
         this.svg = d3.select(svg_id);
         this.airports;
 
@@ -40,10 +41,11 @@ class DaVi {
         this.map_data = typeMap(setup_values[0]);
         this.airports = setup_values[1];
         this.population_data = setup_values[2];
-        this.updateMap(dataset);
+        this.updateMap(dataset, this.fcConstant);
     }
 
-    updateMap(dataset) {
+    updateMap(dataset, minMaxFlightCount) {
+        this.fcConstant = minMaxFlightCount;
         this.flights_dataset = dataset[0];
         this.corona_dataset = dataset[1];
 
@@ -227,18 +229,18 @@ class DaVi {
             .attr("d", line)
             .attr("class", "flight")
             .attr("stroke-width", d => {
-                let width = d[1].weight/this.maxFlightCount;
+                let width = d[1].weight/this.totalFlights;
                 //if(d[1].weight > this.maxFlightCount) console.log(d[1].weight, this.maxFlightCount, this.totalFlights);
-                return this.lineThickness(width);
-                //return 2;
+                //return this.lineThickness(width);
+                return 2;
             }) //d => d.length/3
             .attr("stroke", (d) => {
                 //let color = this.flightColor(d[1].weight);
                 //let res = color.split("(");
                 //let res2 = res[1].split(")");
                 //return "rgba(" + res2[0] + ",0.8)";
-                //let alpha = (d[1].weight/this.maxFlightCount*0.8);
-                return "rgba(255,77,0," + 0.8 + ")";
+                let alpha = (d[1].weight/this.totalFlights)*0.8*this.fcConstant;
+                return "rgba(255,77,0," + alpha + ")";
             })//d => "rgba(0,0,180,"+(d.length/2)+")")
             .each(function (d) {
                 d[0].flights.push(this); // adds the path object to our source airport, makes it fast to select outgoing paths

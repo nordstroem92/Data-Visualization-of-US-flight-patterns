@@ -205,9 +205,28 @@ class DateBrush {
         DataSet.setGeoAreaFilter(geoSettings);
 
         let update = new Promise(resolve => {
-            resolve(dataset_1.refresh().then(data => visualization1.updateMap(data)));
-            resolve(dataset_2.refresh().then(data => visualization2.updateMap(data)));
-            resolve(dataset_3.refresh().then(data => visualization3.updateMap(data)));
+            dataset_1.refresh().then(data => {
+                let maxFlightCount = data[0][2];
+                let totalFlights = data[0][1];
+                minMaxFlightcount = Math.min(totalFlights/maxFlightCount, minMaxFlightcount);
+                dataset_2.refresh().then(data2 => {
+                    let maxFlightCount2 = data2[0][2];
+                    let totalFlights2 = data2[0][1];
+                    minMaxFlightcount = Math.min(totalFlights2/maxFlightCount2, minMaxFlightcount);
+                    resolve(dataset_3.refresh().then(data3 => {
+                        let maxFlightCount3 = data3[0][2];
+                        let totalFlights3 = data3[0][1];
+                        minMaxFlightcount = Math.min(totalFlights3/maxFlightCount3, minMaxFlightcount);
+
+                        visualization1.updateMap(data, minMaxFlightcount);
+                        visualization2.updateMap(data2, minMaxFlightcount);
+                        visualization3.updateMap(data3, minMaxFlightcount);
+                    }));
+                });
+            });
+            //resolve(dataset_1.refresh().then(data => visualization1.updateMap(data)));
+            //resolve(dataset_2.refresh().then(data => visualization2.updateMap(data)));
+            //resolve(dataset_3.refresh().then(data => visualization3.updateMap(data)));
         });
 
         update.then(() => {

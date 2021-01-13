@@ -10,9 +10,32 @@ let dataset_1 = new DataSet("https://raw.githubusercontent.com/nordstroem92/data
 let dataset_2 = new DataSet("https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/flights_2019.csv", "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv"); //"https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv"
 let dataset_3 = new DataSet("https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/flights_2020.csv", "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv");//"https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv"); //"Data/US_Covid.csv");
 
-dataset_1.refresh().then(data => visualization1 = new DaVi("#svg_flights_2018", data));
-dataset_2.refresh().then(data => visualization2 = new DaVi("#svg_flights_2019", data));
-dataset_3.refresh().then(data => visualization3 = new DaVi("#svg_flights_2020", data));
+
+let minMaxFlightcount = Number.MAX_SAFE_INTEGER;
+
+dataset_1.refresh().then(data => {
+    let maxFlightCount = data[0][2];
+    let totalFlights = data[0][1];
+    minMaxFlightcount = Math.min(totalFlights/maxFlightCount, minMaxFlightcount);
+    dataset_2.refresh().then(data2 => {
+        let maxFlightCount2 = data2[0][2];
+        let totalFlights2 = data2[0][1];
+        minMaxFlightcount = Math.min(totalFlights2/maxFlightCount2, minMaxFlightcount);
+        dataset_3.refresh().then(data3 => {
+            let maxFlightCount3 = data3[0][2];
+            let totalFlights3 = data3[0][1];
+            minMaxFlightcount = Math.min(totalFlights3/maxFlightCount3, minMaxFlightcount);
+
+            visualization1 = new DaVi("#svg_flights_2018", data, minMaxFlightcount)
+            visualization2 = new DaVi("#svg_flights_2019", data2, minMaxFlightcount)
+            visualization3 = new DaVi("#svg_flights_2020", data3, minMaxFlightcount)
+        });
+    });
+});
+
+//dataset_1.refresh().then(data => visualization1 = new DaVi("#svg_flights_2018", data, minMaxFlightcount));
+//dataset_2.refresh().then(data => visualization2 = new DaVi("#svg_flights_2019", data, minMaxFlightcount));
+//dataset_3.refresh().then(data => visualization3 = new DaVi("#svg_flights_2020", data, minMaxFlightcount));
 
 let dateBrush_1 = new DateBrush(2018, false);
 let dateBrush_2 = new DateBrush(2019, false);
