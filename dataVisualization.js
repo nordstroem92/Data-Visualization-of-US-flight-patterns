@@ -56,7 +56,7 @@ class DaVi {
         this.totalDeaths = this.corona_dataset[1];
         this.maxDeathCount = this.corona_dataset[2];
 
-        this.lineThickness = d3.scaleLinear().domain([0, this.maxFlightCount/this.totalFlights]).range([0, 3]);
+        this.lineThickness = d3.scaleLinear().domain([0, 1]).range([0, 3]);
 
         this.strengths = d3.scaleLinear().domain([0, this.totalFlights]).range([0, 25 / 2]);
         this.links = d3.scaleLinear().domain([0, this.totalFlights]).range([0, 1]);
@@ -141,6 +141,7 @@ class DaVi {
 
                 return defaultColor;
             })
+            .attr("class", "choropleth_state")
             .attr("d", DaVi.path)
             .append("title")
             .text(d => {
@@ -226,16 +227,18 @@ class DaVi {
             .attr("d", line)
             .attr("class", "flight")
             .attr("stroke-width", d => {
-                let width = d[1].weight/this.totalFlights;
+                let width = d[1].weight/this.maxFlightCount;
                 //if(d[1].weight > this.maxFlightCount) console.log(d[1].weight, this.maxFlightCount, this.totalFlights);
                 return this.lineThickness(width);
+                //return 2;
             }) //d => d.length/3
             .attr("stroke", (d) => {
                 //let color = this.flightColor(d[1].weight);
                 //let res = color.split("(");
                 //let res2 = res[1].split(")");
                 //return "rgba(" + res2[0] + ",0.8)";
-                return "rgba(255,77,0,0.8)";
+                //let alpha = (d[1].weight/this.maxFlightCount*0.8);
+                return "rgba(255,77,0," + 0.8 + ")";
             })//d => "rgba(0,0,180,"+(d.length/2)+")")
             .each(function (d) {
                 d[0].flights.push(this); // adds the path object to our source airport, makes it fast to select outgoing paths
