@@ -6,10 +6,13 @@ DataSet.setDaysOfWeek([1, 2, 3, 4, 5, 6, 0]);
 DataSet.setDateRange({"startDate": new Date("2018-01-01"), "endDate": new Date("2018-08-31")});
 DataSet.setGeoAreaFilter({"geoArea":ALL_AIRPORTS, "checkOrigin": true, "checkDestination": true});
 
-let dataset_1 = new DataSet("https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/flights_2018.csv", "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv");
-let dataset_2 = new DataSet("https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/flights_2019.csv", "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv"); //"https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv"
-let dataset_3 = new DataSet("https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/flights_2020.csv", "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv");//"https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv"); //"Data/US_Covid.csv");
+//let dataset_1 = new DataSet("https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/flights_2018.csv", "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv");
+//let dataset_2 = new DataSet("https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/flights_2019.csv", "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv"); //"https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv"
+//et dataset_3 = new DataSet("https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/flights_2020.csv", "https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv");//"https://raw.githubusercontent.com/nordstroem92/datavisualisering/master/Data/US_Covid.csv"); //"Data/US_Covid.csv");
 
+let dataset_1 = new DataSet("Data/flights_2018.csv", "Data/US_Covid.csv");
+let dataset_2 = new DataSet("Data/flights_2019.csv", "Data/US_Covid.csv");
+let dataset_3 = new DataSet("Data/flights_2020.csv", "Data/US_Covid.csv");
 
 let minMaxFlightcount = Number.MAX_SAFE_INTEGER;
 

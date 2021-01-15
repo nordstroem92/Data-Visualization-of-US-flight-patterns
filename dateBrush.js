@@ -218,6 +218,9 @@ class DateBrush {
                         let totalFlights3 = data3[0][1];
                         minMaxFlightcount = Math.min(totalFlights3/maxFlightCount3, minMaxFlightcount);
 
+                        console.log(data)
+                        console.log(data2)
+                        console.log(data3)
                         visualization1.updateMap(data, minMaxFlightcount);
                         visualization2.updateMap(data2, minMaxFlightcount);
                         visualization3.updateMap(data3, minMaxFlightcount);

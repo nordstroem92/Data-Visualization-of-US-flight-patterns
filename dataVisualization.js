@@ -63,15 +63,28 @@ class DaVi {
         this.strengths = d3.scaleLinear().domain([0, this.totalFlights]).range([0, 25 / 2]);
         this.links = d3.scaleLinear().domain([0, this.totalFlights]).range([0, 1]);
 
+
         this.flightColor = d3.scaleLinear()
             .domain([0, this.maxFlightCount/3, this.maxFlightCount*2/3, this.maxFlightCount])
             .range(['#edf8e9','#bae4b3','#74c476','#31a354','#006d2c'])
             .interpolate(d3.interpolateHcl);
 
+        let adjustedDeathCount = this.maxDeathCount/100.0
+
+        /*
         this.coronaColor = d3.scaleLinear()
-            .domain([0, 0.3/3, 0.3*2/3, 0.3])
+            .domain([0, adjustedDeathCount/3, adjustedDeathCount*2/3, adjustedDeathCount])
             .range(['#f7f7f7','#cccccc','#969696','#636363'])
             .interpolate(d3.interpolateHcl);
+
+         */
+
+
+        this.coronaColor = d3.scaleLinear()
+            .domain([0, adjustedDeathCount/3, adjustedDeathCount*2/3, adjustedDeathCount])
+            .range(['#f0f9e8','#bae4bc','#7bccc4','#2b8cbe'])
+            .interpolate(d3.interpolateHcl);
+
 
 
         let legend = null;
@@ -135,7 +148,8 @@ class DaVi {
                     if(feature.properties.name !== obj.STATE) continue;
                     feature.properties.deaths = obj.DEATHS;
                     let percentage = obj.DEATHS/this.totalDeaths;
-                    let color = this.coronaColor(percentage);
+                    //let color = this.coronaColor(percentage);
+                    let color = this.coronaColor(obj.DEATHS/100.0);
                     let res = color.split("(");
                     let res2 = res[1].split(")");
                     return "rgba(" + res2[0] + ",1)";
@@ -149,7 +163,8 @@ class DaVi {
             .text(d => {
                 let rounded = Math.floor(d.properties.deaths)/100.0;
                 let percentage = Math.floor(d.properties.deaths/this.totalDeaths*100);
-                return d.properties.name + ": " + percentage + "%";
+                //return d.properties.name + ": " + percentage + "%";
+                return d.properties.name + ": " + rounded;
             });
     }
 
@@ -240,7 +255,8 @@ class DaVi {
                 //let res2 = res[1].split(")");
                 //return "rgba(" + res2[0] + ",0.8)";
                 let alpha = (d[1].weight/this.totalFlights)*0.8*this.fcConstant;
-                return "rgba(255,77,0," + alpha + ")";
+                //return "rgba(255,77,0," + alpha + ")";
+                return "rgba(0,0,0," + alpha + ")";
             })//d => "rgba(0,0,180,"+(d.length/2)+")")
             .each(function (d) {
                 d[0].flights.push(this); // adds the path object to our source airport, makes it fast to select outgoing paths
