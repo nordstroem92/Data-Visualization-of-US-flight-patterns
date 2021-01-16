@@ -141,10 +141,10 @@ text {
 }
 /* shadow trick from bl.ocks.org */
 .tooltip {
-  font-size: 10pt;
-  font-weight: 900;
-  fill: white;
-  text-shadow: 1px 1px 0 #252525, 1px -1px 0 #252525, -1px 1px 0 #252525, -1px -1px 0 #252525;
+  font-size: 14px;
+  font-weight: 700;
+  fill: black;
+  /*text-shadow: 0.5px 0.5px 0 #252525, 0.5px -0.5px 0 #252525, -0.5px 0.5px 0 #252525, -0.5px -0.5px 0 #252525;*/
 }
 
 #loader { /*loading screen*/

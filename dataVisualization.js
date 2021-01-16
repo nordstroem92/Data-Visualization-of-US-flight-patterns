@@ -79,13 +79,10 @@ class DaVi {
 
          */
 
-
         this.coronaColor = d3.scaleLinear()
             .domain([0, adjustedDeathCount/3, adjustedDeathCount*2/3, adjustedDeathCount])
             .range(['#f0f9e8','#bae4bc','#7bccc4','#2b8cbe'])
             .interpolate(d3.interpolateHcl);
-
-
 
         let legend = null;
 
@@ -100,6 +97,20 @@ class DaVi {
         this.drawAirports();
         this.drawFlights(this.flights);
         //this.drawPolygons();
+
+        var g = d3.selectAll("svg > g");
+        var tooltip = d3.selectAll(".tooltip");
+
+        var zoom = d3.zoom()
+            .scaleExtent([1, 3])
+            .on('zoom', function() {
+                g.attr('transform', d3.event.transform);
+                tooltip
+                    .attr('transform', d3.event.transform)
+                    .attr('fill', "red");
+        });
+      
+        this.svg.call(zoom);
     }
 
     drawMap(covid_data) { // DRAW UNDERLYING MAP
@@ -117,7 +128,7 @@ class DaVi {
         } else {
             basemap_fill = "#F5F5F5";
         }
-
+        
         this.g.basemap.append("path") // draw base map
             .datum(land)
             .attr("class", "land")
