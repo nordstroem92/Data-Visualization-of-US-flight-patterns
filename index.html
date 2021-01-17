@@ -1,84 +1,84 @@
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 
 <head>
-  <meta charset="utf-8">
-  <title>Flight Paths using Edge Bundling</title>
+    <meta charset="utf-8">
+    <title>Flight Paths using Edge Bundling</title>
 
-  <script src="https://d3js.org/d3.v5.min.js"></script>
-  <script src="https://unpkg.com/topojson@3"></script>
-  <script src="https://unpkg.com/d3-delaunay@4"></script>
-  <script src="https://unpkg.com/d3-geo-voronoi@1"></script>
-  <script src="dataProcessing.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+    <script src="https://unpkg.com/d3-delaunay@4"></script>
+    <script src="https://unpkg.com/d3-geo-voronoi@1"></script>
+    <script src="dataProcessing.js"></script>
 
-  <link href="style.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
 </head>
 
 <body>
 
 
 <div style="margin-top: 20px; position: relative; left: -40px">
-  <svg id="svg_flights_2018" width="480" height="320">
-    <!-- must be in this order for drawing -->
-    <g class="basemap"></g>
-    <g class="flights"></g>
-    <g class="airports"></g>
-    <text class="tooltip" style="display: none;"></text>
-  </svg>
+    <svg id="svg_flights_2018" width="480" height="320">
+        <!-- must be in this order for drawing -->
+        <g class="basemap"></g>
+        <g class="flights"></g>
+        <g class="airports"></g>
+        <text class="tooltip" style="display: none;"></text>
+    </svg>
 
-  <svg id="svg_flights_2019" width="480" height="320">
-    <!-- must be in this order for drawing -->
-    <g class="basemap"></g>
-    <g class="flights"></g>
-    <g class="airports"></g>
-    <text class="tooltip" style="display: none;"></text>
-  </svg>
+    <svg id="svg_flights_2019" width="480" height="320">
+        <!-- must be in this order for drawing -->
+        <g class="basemap"></g>
+        <g class="flights"></g>
+        <g class="airports"></g>
+        <text class="tooltip" style="display: none;"></text>
+    </svg>
 
-  <svg id="svg_flights_2020" width="480" height="320">
-    <!-- must be in this order for drawing -->
-    <g class="basemap"></g>
-    <g class="flights"></g>
-    <g class="airports"></g>
-    <text class="tooltip" style="display: none;"></text>
-  </svg>
-  <div id="datebrush-container"></div>
-  <div class="legend" style="position: relative; margin-right: -50px; top: -280px; left: 88vw;"></div>
-<div class="all-panels-container">
-  <div class="input-container geo-panel" id="geo_options">
-    <p><b>Geo options</b></p>
-    <input type="checkbox" id="checkOrigin" checked>
-    <label class="noselect" for="checkOrigin">Check Destination</label><br>
-    <input type="checkbox" id="checkDestination" checked>
-    <label class="noselect" for="checkDestination">Check Origin</label><br>
-  </div>
+    <svg id="svg_flights_2020" width="480" height="320">
+        <!-- must be in this order for drawing -->
+        <g class="basemap"></g>
+        <g class="flights"></g>
+        <g class="airports"></g>
+        <text class="tooltip" style="display: none;"></text>
+    </svg>
+    <div id="datebrush-container"></div>
+    <div class="legend" style="position: relative; margin-right: -50px; top: -280px; left: 88vw;"></div>
+    <div class="all-panels-container">
+        <div class="input-container geo-panel" id="geo_options">
+            <p><b>Geo options</b></p>
+            <input type="checkbox" id="checkOrigin" checked>
+            <label class="noselect" for="checkOrigin">Check Destination</label><br>
+            <input type="checkbox" id="checkDestination" checked>
+            <label class="noselect" for="checkDestination">Check Origin</label><br>
+        </div>
 
-  <div class=" input-container week-panel" id="days_of_week">
-    <p><b>Days of Week</b></p>
-    <div>
-      <input type="checkbox" id="1" checked>
-      <label class="noselect" for="1">Monday</label><br>
-      <input type="checkbox" id="2" checked>
-      <label class="noselect" for="2">Tuesday</label><br>
-      <input type="checkbox" id="3" checked>
-      <label class="noselect" for="3">Wednesday</label><br>
-      <input type="checkbox" id="4" checked>
-      <label class="noselect" for="4">Thursday</label><br>
+        <div class=" input-container week-panel" id="days_of_week">
+            <p><b>Days of Week</b></p>
+            <div>
+                <input type="checkbox" id="1" checked>
+                <label class="noselect" for="1">Monday</label><br>
+                <input type="checkbox" id="2" checked>
+                <label class="noselect" for="2">Tuesday</label><br>
+                <input type="checkbox" id="3" checked>
+                <label class="noselect" for="3">Wednesday</label><br>
+                <input type="checkbox" id="4" checked>
+                <label class="noselect" for="4">Thursday</label><br>
+            </div>
+            <div>
+                <input type="checkbox" id="5" checked>
+                <label class="noselect" for="5">Friday</label><br>
+                <input type="checkbox" id="6" checked>
+                <label class="noselect" for="6">Saturday</label><br>
+                <input type="checkbox" id="0" checked>
+                <label class="noselect" for="0">Sunday</label><br>
+            </div>
+            <div>
+            </div>
+        </div>
+        <div class="btn-div">
+            <button id="updateButton">Update Data</button>
+            <button id="toggleButton">Toggle Choropleth</button>
+        </div>
     </div>
-    <div> 
-      <input type="checkbox" id="5" checked>
-      <label class="noselect" for="5">Friday</label><br>
-      <input type="checkbox" id="6" checked>
-      <label class="noselect" for="6">Saturday</label><br>
-      <input type="checkbox" id="0" checked>
-      <label class="noselect" for="0">Sunday</label><br>
-    </div>
-    <div>
-    </div>
-  </div>
-  <div class="btn-div">
-    <button id="updateButton">Update Data</button>
-    <button id="toggleButton">Toggle Choropleth</button>
-  </div>
-</div>
 </div>
 
 <div id="selectionBox" hidden></div>
@@ -88,10 +88,9 @@
 <script src="colorLegend.js"></script>
 <script src="dataVisualization.js"></script>
 <script src="dateBrush.js"></script>
-<script src="script.js"></script >
+<script src="script.js"></script>
 <script src="boundingBoxSelection.js"></script>
 <script src="toggleChoropleth.js"></script>
-
 
 
 </body>

@@ -98,10 +98,10 @@ class DaVi {
         this.drawFlights(this.flights);
         //this.drawPolygons();
 
-        var g = d3.selectAll("svg > g");
-        var tooltip = d3.selectAll(".tooltip");
+        let g = d3.selectAll("svg > g").filter(function(d, i) { return i <= 8; }); // hacky solution, select only first 9 elements (which are the ones we happen to want to zoom in on)
+        let tooltip = d3.selectAll(".tooltip");
 
-        var zoom = d3.zoom()
+        let zoom = d3.zoom()
             .scaleExtent([1, 3])
             .on('zoom', function() {
                 g.attr('transform', d3.event.transform);
