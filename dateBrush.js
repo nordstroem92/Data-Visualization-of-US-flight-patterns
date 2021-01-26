@@ -228,9 +228,9 @@ class DateBrush {
                     }));
                 });
             });
-            //resolve(dataset_1.refresh().then(data => visualization1.updateMap(data)));
-            //resolve(dataset_2.refresh().then(data => visualization2.updateMap(data)));
-            //resolve(dataset_3.refresh().then(data => visualization3.updateMap(data)));
+            resolve(dataset_1.refresh().then(data => visualization1.updateMap(data)));
+            resolve(dataset_2.refresh().then(data => visualization2.updateMap(data)));
+            resolve(dataset_3.refresh().then(data => visualization3.updateMap(data)));
         });
 
         update.then(() => {
