@@ -44,7 +44,7 @@ body {
 
 .highlight {
   opacity: 1 !important;
-  stroke: rgb(0,178,255) !important;
+  stroke: rgb(255,0,0) !important;
   stroke-width: 2px !important;
   stroke-opacity: 0.9 !important;
 }

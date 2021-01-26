@@ -60,8 +60,8 @@ class DaVi {
 
         this.lineThickness = d3.scaleLinear().domain([0, 1]).range([0, 3]);
 
-        this.strengths = d3.scaleLinear().domain([0, this.totalFlights]).range([0, 25 / 2]);
-        this.links = d3.scaleLinear().domain([0, this.totalFlights]).range([0, 1]);
+        this.strengths = d3.scaleLinear().domain([0, this.totalFlights]).range([0, 25/1.5]);
+        this.links = d3.scaleLinear().domain([0, this.totalFlights]).range([0, 0.6]);
 
 
         this.flightColor = d3.scaleLinear()
@@ -255,10 +255,10 @@ class DaVi {
             .attr("d", line)
             .attr("class", "flight")
             .attr("stroke-width", d => {
-                let width = d[1].weight/this.totalFlights;
+                let width = (d[1].weight/this.totalFlights)*this.fcConstant*3;
                 //if(d[1].weight > this.maxFlightCount) console.log(d[1].weight, this.maxFlightCount, this.totalFlights);
-                //return this.lineThickness(width);
-                return 2;
+                return width;
+                //return 2;
             }) //d => d.length/3
             .attr("stroke", (d) => {
                 //let color = this.flightColor(d[1].weight);
@@ -267,7 +267,7 @@ class DaVi {
                 //return "rgba(" + res2[0] + ",0.8)";
                 let alpha = (d[1].weight/this.totalFlights)*0.8*this.fcConstant;
                 //return "rgba(255,77,0," + alpha + ")";
-                return "rgba(0,0,0," + alpha + ")";
+                return "rgba(0,0,0," + 0.8 + ")";
             })//d => "rgba(0,0,180,"+(d.length/2)+")")
             .each(function (d) {
                 d[0].flights.push(this); // adds the path object to our source airport, makes it fast to select outgoing paths
@@ -277,11 +277,14 @@ class DaVi {
             .alphaDecay(0.5) // settle at a layout faster
 
             .force("charge", d3.forceManyBody() // nearby nodes attract each other
-                .strength(d => this.strengths(d.outgoing*200))//0.2
+                .strength(d => this.strengths(d.outgoing*this.fcConstant))//0.2
                 .distanceMax(100)
             )
             .force("link", d3.forceLink() // edges want to be as short as possible, prevents too much stretching
-                .strength(d => this.links(d.weight)*0.3) //0.6
+                .strength(d => {
+                    let linkStrength = this.links(d.weight*this.fcConstant);
+                    return linkStrength;
+                }) //0.6
                 .distance(1)
             )
             .on("tick", function (d) {

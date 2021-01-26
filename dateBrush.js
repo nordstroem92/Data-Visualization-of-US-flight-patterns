@@ -208,6 +208,7 @@ class DateBrush {
             dataset_1.refresh().then(data => {
                 let maxFlightCount = data[0][2];
                 let totalFlights = data[0][1];
+                minMaxFlightcount = Number.MAX_SAFE_INTEGER;
                 minMaxFlightcount = Math.min(totalFlights/maxFlightCount, minMaxFlightcount);
                 dataset_2.refresh().then(data2 => {
                     let maxFlightCount2 = data2[0][2];
