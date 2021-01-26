@@ -14,11 +14,11 @@ body {
 }
 
 .interior {
-  stroke: rgb(169, 169, 169);/*white;*/
+  stroke: #587e91 ;/*white;*/
 }
 
 .exterior {
-  stroke:  rgb(169, 169, 169); /* #bbbbbb;*/
+  stroke:  #587e91 ; /* #bbbbbb;*/
 }
 
 .airport {
@@ -59,7 +59,7 @@ g.voronoi {
 }
 .line {
   fill: none;
-  stroke: rgb(255,77,0);  /*steelblue;*/
+  stroke: black;  /*steelblue;*/
   stroke-width: 2px;
 }
 
