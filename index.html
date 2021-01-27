@@ -15,7 +15,11 @@
 
 <body>
 
-
+<div style="display: block; width: 80%; margin: 30px auto 0 auto;">
+    <div style="width: 33%; display: inline-block; text-align: left;"><h1>flights 2018</h1></div>
+    <div style="width: 33%; display: inline-block; text-align: left;"><h1>flights 2019</h1></div>
+    <div style="width: 33%; display: inline-block; text-align: left;"><h1>flights 2020</h1></div>
+</div>
 <div style="margin-top: 20px; position: relative; left: -40px">
     <svg id="svg_flights_2018" width="480" height="320">
         <!-- must be in this order for drawing -->
@@ -40,7 +44,7 @@
         <g class="airports"></g>
         <text class="tooltip" style="display: none;"></text>
     </svg>
-    <div id="datebrush-container"></div>
+    <div id="datebrush-container" style="margin-left: -50px"></div>
     <div class="legend" style="position: relative; margin-right: -50px; top: -280px; left: 88vw;"></div>
     <div class="all-panels-container">
         <div class="input-container geo-panel" id="geo_options">
