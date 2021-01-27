@@ -69,7 +69,7 @@ class DaVi {
             .range(['#edf8e9','#bae4b3','#74c476','#31a354','#006d2c'])
             .interpolate(d3.interpolateHcl);
 
-        let adjustedDeathCount = this.maxDeathCount/100.0
+        let adjustedDeathCount = this.maxDeathCount
 
         /*
         this.coronaColor = d3.scaleLinear()
@@ -79,6 +79,7 @@ class DaVi {
 
          */
 
+        console.log(adjustedDeathCount)
         this.coronaColor = d3.scaleLinear()
             .domain([0, adjustedDeathCount/3, adjustedDeathCount*2/3, adjustedDeathCount])
             .range(['#f0f9e8','#bae4bc','#7bccc4','#43a2ca'])
@@ -161,7 +162,7 @@ class DaVi {
                     feature.properties.deaths = obj.DEATHS;
                     let percentage = obj.DEATHS/this.totalDeaths;
                     //let color = this.coronaColor(percentage);
-                    let color = this.coronaColor(obj.DEATHS/100.0);
+                    let color = this.coronaColor(obj.DEATHS);
                     let res = color.split("(");
                     let res2 = res[1].split(")");
                     return "rgba(" + res2[0] + ",1)";
@@ -176,7 +177,7 @@ class DaVi {
                 let rounded = Math.floor(d.properties.deaths)/100.0;
                 let percentage = Math.floor(d.properties.deaths/this.totalDeaths*100);
                 //return d.properties.name + ": " + percentage + "%";
-                return d.properties.name + ": " + rounded;
+                return d.properties.name + ": " + d.properties.deaths;
             });
     }
 

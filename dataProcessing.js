@@ -80,7 +80,7 @@ class DataSet {
 
                 if (coronaDateFilter && coronaDayOfWeekFilter) {
                     let summedDeathVal = 0;
-                    let deathVal = parseFloat(corona.NEW_DEATHS);
+                    let deathVal = parseFloat(corona.RELATIVE_DEATHS);
                     totalDeaths += deathVal;
 
                     let coronaIndex = listContainsState(coronaAggregatedData, corona);
